@@ -1,0 +1,7 @@
+[submodule "godot-cpp"]
+	path = godot-cpp
+	url = https://github.com/godotengine/godot-cpp.git
+	branch = 4.4
+[submodule "USD"]
+	path = USD
+	url = https://github.com/PixarAnimationStudios/OpenUSD.git
