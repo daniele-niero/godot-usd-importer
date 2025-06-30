@@ -1,1 +1,7 @@
 demo/*
+.sconsign.dblite
+*.obj
+third_party/*
+build/*
+bin/*
+.vscode/intellisense/*

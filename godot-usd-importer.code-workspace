@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"godotTools.editorPath.godot4": "Godot_v4.4.exe"
+	}
+}
