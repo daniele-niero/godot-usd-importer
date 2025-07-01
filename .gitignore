@@ -1,7 +1,11 @@
 demo/*
 .sconsign.dblite
 *.obj
+*.uid
 third_party/*
 build/*
 bin/*
 .vscode/intellisense/*
+UsdImporter/bin
+usd
+msvc_capture.log

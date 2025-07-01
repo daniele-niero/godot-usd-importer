@@ -2,6 +2,8 @@
 import os
 import sys
 
+# python .\build_scripts\build_usd.py --no-python --no-examples --no-tutorials --no-tools --no-materialx --no-imaging --build-monolithic --dry_run ../usd
+
 # Use 'build' as the build output directory, do not duplicate source files
 VariantDir('build', 'src', duplicate=0)
 
@@ -19,8 +21,8 @@ env = SConscript("godot-cpp/SConstruct")
 env.Append(CPPPATH=["build/"])
 sources = Glob("build/*.cpp")
 
-usd_include_path = "third_party/usd/include"  # Change to your USD include path
-usd_lib_path = "third_party/usd/lib"          # Change to your USD lib path
+usd_include_path = "usd/include"  # Change to your USD include path
+usd_lib_path = "usd/lib"          # Change to your USD lib path
 
 env.Append(CPPPATH=[usd_include_path])
 env.Append(LIBPATH=[usd_lib_path])
@@ -44,7 +46,7 @@ env.Append(LIBS=[
 
 if env["platform"] == "macos":
     library = env.SharedLibrary(
-        "bin/usd_importer.{}.{}.framework/libgdexample.{}.{}".format(
+        "GodotUsdImporter/bin/usd_importer.{}.{}.framework/libgdexample.{}.{}".format(
             env["platform"], env["target"], env["platform"], env["target"]
         ),
         source=sources,
@@ -52,17 +54,17 @@ if env["platform"] == "macos":
 elif env["platform"] == "ios":
     if env["ios_simulator"]:
         library = env.StaticLibrary(
-            "bin/usd_importer.{}.{}.simulator.a".format(env["platform"], env["target"]),
+            "GodotUsdImporter/bin/usd_importer.{}.{}.simulator.a".format(env["platform"], env["target"]),
             source=sources,
         )
     else:
         library = env.StaticLibrary(
-            "bin/usd_importer.{}.{}.a".format(env["platform"], env["target"]),
+            "GodotUsdImporter/bin/usd_importer.{}.{}.a".format(env["platform"], env["target"]),
             source=sources,
         )
 else:
     library = env.SharedLibrary(
-        "bin/usd_importer{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+        "GodotUsdImporter/bin/usd_importer{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
         source=sources,
     )
 
