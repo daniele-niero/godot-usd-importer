@@ -25,26 +25,26 @@ static Ref<ArrayMesh> _usd_mesh_to_godot(const UsdGeomMesh &usd_mesh) {
 
     VtArray<GfVec3f> points;
     usd_mesh.GetPointsAttr().Get(&points);
-    VtArray<int> faceVertexCounts, faceVertexIndices;
-    usd_mesh.GetFaceVertexCountsAttr().Get(&faceVertexCounts);
-    usd_mesh.GetFaceVertexIndicesAttr().Get(&faceVertexIndices);
+    VtArray<int> face_vertex_counts, face_vertex_indices;
+    usd_mesh.GetFaceVertexCountsAttr().Get(&face_vertex_counts);
+    usd_mesh.GetFaceVertexIndicesAttr().Get(&face_vertex_indices);
 
-    // Normals (optional)
+    // Normals
     VtArray<GfVec3f> normals;
     bool has_normals = usd_mesh.GetNormalsAttr().Get(&normals);
 
-    // Orientation: rightHanded (default, CCW), leftHanded (CW)
-    TfToken orientation_token;
-    usd_mesh.GetOrientationAttr().Get(&orientation_token);
-    bool reverse_winding = (orientation_token == TfToken("leftHanded"));
+    // Face Orientation (cvs connection clockwise or counter-clockwise)
+    TfToken face_orientation_token;
+    usd_mesh.GetOrientationAttr().Get(&face_orientation_token);
+    bool reverse_winding = (face_orientation_token == TfToken("leftHanded"));
 
     int idx = 0;
-    for (size_t f = 0; f < faceVertexCounts.size(); ++f) {
-        int n = faceVertexCounts[f];
+    for (size_t f = 0; f < face_vertex_counts.size(); ++f) {
+        int n = face_vertex_counts[f];
         // Collect polygon indices
         std::vector<int> poly_indices;
         for (int v = 0; v < n; ++v) {
-            poly_indices.push_back(faceVertexIndices[idx + v]);
+            poly_indices.push_back(face_vertex_indices[idx + v]);
         }
         if (reverse_winding) {
             std::reverse(poly_indices.begin(), poly_indices.end());
@@ -72,7 +72,8 @@ static Ref<ArrayMesh> _usd_mesh_to_godot(const UsdGeomMesh &usd_mesh) {
         }
         idx += n;
     }
-    st->generate_normals();
+    if (!has_normals)
+        st->generate_normals();
     mesh = st->commit();
     return mesh;
 }
