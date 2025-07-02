@@ -1,7 +1,9 @@
 #include "usd_visitor.h"
+#include <pxr/usd/usdGeom/scope.h>
 #include <pxr/usd/usdGeom/xform.h>
 #include <pxr/usd/usdGeom/mesh.h>
 #include <pxr/base/gf/vec3f.h>
+#include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/array_mesh.hpp>
 #include <godot_cpp/classes/surface_tool.hpp>
 #include <godot_cpp/classes/mesh_instance3d.hpp>
@@ -70,23 +72,21 @@ static Ref<ArrayMesh> _usd_mesh_to_godot(const UsdGeomMesh &usd_mesh) {
         }
         idx += n;
     }
-    // st->generate_normals();
+    st->generate_normals();
     mesh = st->commit();
     return mesh;
 }
 
-void UsdToGodotVisitor::visit(const UsdPrim &prim, Node3D *parent) {
-    Node3D *node = nullptr;
+void UsdToGodotVisitor::visit(const UsdPrim &prim, Node *parent) {
+    Node *node = nullptr;
 
-    if (prim.IsA<UsdGeomXform>()) {
-        print_line("Visiting Xform: " + String(prim.GetName().GetText()));
+    if (prim.IsA<UsdGeomScope>() || prim.IsA<UsdGeomXform>()) {
         node = memnew(Node3D);
         node->set_name(String(prim.GetName().GetText()));
         // TODO: Apply transform
-    } 
-    
+    }
+
     else if (prim.IsA<UsdGeomMesh>()) {
-        print_line("Visiting Mesh: " + String(prim.GetName().GetText()));
         UsdGeomMesh usd_mesh(prim);
         Ref<ArrayMesh> mesh = _usd_mesh_to_godot(usd_mesh);
         MeshInstance3D *mi = memnew(MeshInstance3D);
@@ -99,12 +99,14 @@ void UsdToGodotVisitor::visit(const UsdPrim &prim, Node3D *parent) {
         if (parent) {
             parent->add_child(node);
         }
+        print_line(scene_root);
         node->set_owner(scene_root);
+        for (const UsdPrim &child : prim.GetChildren())
+            visit(child, node);
+    } else{
+        for (const UsdPrim &child : prim.GetChildren())
+            visit(child, parent);
     }
-    
-    for (const UsdPrim &child : prim.GetChildren())
-        visit(child, node);
-    
 }
 
 Node3D* UsdToGodotVisitor::build_godot_scene(const UsdStageRefPtr stage, const String &scene_name) {
@@ -120,7 +122,7 @@ Node3D* UsdToGodotVisitor::build_godot_scene(const UsdStageRefPtr stage, const S
     for (const UsdPrim &prim : root_prim.GetChildren()) {
         visit(prim, scene_root);
     }
-    
+
     return scene_root;
 }
 

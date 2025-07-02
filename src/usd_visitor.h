@@ -18,7 +18,7 @@ public:
 private:
     Node3D* scene_root = nullptr;
     // Entry point: visit a USD prim and build Godot nodes under parent
-    void visit(const pxr::UsdPrim &prim, Node3D *parent = nullptr);
+    void visit(const pxr::UsdPrim &prim, Node *parent = nullptr);
 };
 
 } // namespace godot
