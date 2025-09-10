@@ -9,3 +9,4 @@ bin/*
 UsdImporter/bin
 usd
 msvc_capture.log
+vc140.pdb

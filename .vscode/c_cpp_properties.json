@@ -4,11 +4,10 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/src",
-                "${workspaceFolder}/third_party/usd/include",
+                "${workspaceFolder}/Usd/include",
                 "${workspaceFolder}/godot-cpp/**"
             ],
             "windowsSdkVersion": "10.0.22621.0",
-            "compilerPath": "C:/Users/danie/AppData/Local/Programs/Swift/Toolchains/6.1.0+Asserts/usr/bin/clang.exe",
             "cStandard": "c17",
             "cppStandard": "c++17"
         }

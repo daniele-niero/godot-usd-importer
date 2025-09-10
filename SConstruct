@@ -3,6 +3,10 @@ import os
 import sys
 import shutil
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from SCons.Script import Environment, Command, SConscript, Variables
+
 # Paths
 usd_build_dir = "usd"
 usd_include_path = os.path.join(usd_build_dir, "include")
@@ -10,14 +14,36 @@ usd_lib_path = os.path.join(usd_build_dir, "lib")
 usd_bin_path = os.path.join(usd_build_dir, "bin")
 usd_importer_bin = "UsdImporter/bin"
 
-# Step 1: Build USD if needed
-usd_marker = os.path.join(usd_include_path, "pxr", "pxr.h")  # Marker file
-usd_build_command = f"{sys.executable} OpenUSD/build_scripts/build_usd.py --no-python --no-examples --no-tutorials --no-tools --no-materialx --no-imaging --build-monolithic {usd_build_dir}"
+# Define variables with help text
+vars = Variables()
+vars.Add('force_usd_build', 'Force USD rebuild (default: 0)', 0)
 
+# Step 1: Build USD if needed
+def build_usd(target, source, env):
+    import subprocess
+
+    build_variant = "release"
+    if env.get('target') == "template_debug":
+        build_variant = "debug"
+
+    usd_marker = str(target[0])
+    if env.get('force_usd_build', False) or not os.path.exists(usd_marker):
+        usd_build_script = os.path.join("build_scripts", "build_usd.py")
+        usd_build_dir = "../usd"
+        cmd = [
+            sys.executable, usd_build_script,
+            "--no-python", "--no-examples", "--no-tutorials", "--no-tools",
+            "--no-materialx", "--no-imaging", "--build-monolithic", 
+            "--build-variant", build_variant, usd_build_dir
+        ]
+        subprocess.check_call(cmd, cwd="OpenUSD")
+    return 0
+
+usd_marker = os.path.join(usd_include_path, "pxr", "pxr.h")  # Marker file
 usd_build = Command(
     target=usd_marker,
     source=[],
-    action=usd_build_command,
+    action=build_usd,
     ENV=os.environ
 )
 
