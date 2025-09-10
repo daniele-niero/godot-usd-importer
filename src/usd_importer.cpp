@@ -99,7 +99,7 @@ Error USDImporter::_import(const String &source_file, const String &save_path, c
     // Attempt to open the USD stage
     UsdStageRefPtr stage = UsdStage::Open(std::string(godot_path.utf8().get_data()));
     if (!stage) {
-        print_line("Failed to open USD stage: " + godot_path);
+        print_error("Failed to open USD stage: " + godot_path);
         return ERR_CANT_OPEN;
     }
 
@@ -107,13 +107,14 @@ Error USDImporter::_import(const String &source_file, const String &save_path, c
     String root_name = godot_path.get_file().get_basename();
 
     UsdToGodotVisitor visitor;
-    Node3D* root_node = visitor.build_godot_scene(stage, root_name);    
+    Node3D* root_node = visitor.build_godot_scene(stage, root_name);
     
     scene->pack(root_node);
     String file_path = save_path + String(".") + _get_save_extension();
     print_line("Saving scene to: " + save_path);
     Error err = ResourceSaver::get_singleton()->save(scene, file_path);
     if (err != Error::OK) {
+        print_error("Failed to save scene: " + file_path + " with error: " + itos(err));
         return err;
     }
     print_line("ALL GOOD!");

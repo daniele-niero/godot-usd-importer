@@ -4,5 +4,5 @@
 
 using namespace godot;
 
-void Initialize(ModuleInitializationLevel p_level);
-void Uninitialize(ModuleInitializationLevel p_level);
+void initialize_usd_importer(ModuleInitializationLevel p_level);
+void uninitialize_usd_importer(ModuleInitializationLevel p_level);

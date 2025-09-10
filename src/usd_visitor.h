@@ -1,4 +1,3 @@
-// src/usd_visitor.h
 #pragma once
 
 #include <pxr/usd/usd/stage.h>
