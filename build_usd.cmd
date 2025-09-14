@@ -1,0 +1,1 @@
+python .\OpenUSD\build_scripts\build_usd.py --no-python --no-examples --no-tutorials --no-tools --no-materialx --no-imaging --build-monolithic --build-variant release .\usd

@@ -2,11 +2,15 @@ demo/*
 .sconsign.dblite
 *.obj
 *.uid
+*.pdb
+*.pyd
+*.pyc
+*.dll
+*.lib
 third_party/*
 build/*
 bin/*
 .vscode/intellisense/*
 UsdImporter/bin
-usd
+usd_build
 msvc_capture.log
-vc140.pdb
