@@ -12,5 +12,5 @@ build/*
 bin/*
 .vscode/intellisense/*
 UsdImporter/bin
-usd_build
+usd
 msvc_capture.log

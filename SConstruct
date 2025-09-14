@@ -2,53 +2,48 @@ import os
 from scons_hints import *
 
 
-usd_importer_bin = "UsdImporter/bin"
+env = SConscript("godot-cpp/SConstruct")
 
-vars = Variables()
-vars.Add('force_usd_build', 'Force USD rebuild (default: 0)', 0)  # Default is 0 (off)
-env = Environment(variables=vars, ENV=os.environ)
-vars.Update(env)
-Help(vars.GenerateHelpText(env))
-Export('env')
+build_variant = "release"
+if env.get('target') == "template_debug":
+    build_variant = "debug"
 
-Import("env")
+usd_importer_bin = f"UsdImporter/bin/{build_variant}"
 
-env = SConscript("godot-cpp/SConstruct", export={'env': env})
-Export('env')
-
-# Load USD logic
-env, usd_build, usd_build_dir, usd_include_path, usd_lib_path, usd_bin_path = SConscript("UsdSConscript.py")
-
-VariantDir('build', 'src', duplicate=0)
+usd_build_dir = f"usd/{build_variant}"
+usd_include_path = os.path.join(usd_build_dir, "include")
+usd_lib_path = os.path.join(usd_build_dir, "lib")
+usd_bin_path = os.path.join(usd_build_dir, "bin")
 
 
-env.Append(CPPPATH=["build/", usd_include_path])
+VariantDir(f'build/{build_variant}', 'src', duplicate=0)
+env.Append(CPPPATH=[f'build/{build_variant}', usd_include_path])
 env.Append(LIBPATH=[usd_lib_path])
-sources = Glob("build/*.cpp")
+sources = Glob(f'build/{build_variant}/*.cpp')
 
 if env["platform"] == "macos":
     library = env.SharedLibrary(
-        f"UsdImporter/bin/usd_importer.{env['platform']}.{env['target']}.framework/libgdexample.{env['platform']}.{env['target']}",
+        f"UsdImporter/bin/{build_variant}/usd_importer.{env['platform']}.{env['target']}.framework/libgdexample.{env['platform']}.{env['target']}",
         source=sources,
     )
 elif env["platform"] == "ios":
     if env["ios_simulator"]:
         library = env.StaticLibrary(
-            f"UsdImporter/bin/usd_importer.{env['platform']}.{env['target']}.simulator.a",
+            f"UsdImporter/bin/{build_variant}/usd_importer.{env['platform']}.{env['target']}.simulator.a",
             source=sources,
         )
     else:
         library = env.StaticLibrary(
-            f"UsdImporter/bin/usd_importer.{env['platform']}.{env['target']}.a",
+            f"UsdImporter/bin/{build_variant}/usd_importer.{env['platform']}.{env['target']}.a",
             source=sources,
         )
 else:
     library = env.SharedLibrary(
-        f"UsdImporter/bin/usd_importer{env['suffix']}{env['SHLIBSUFFIX']}",
+        f"UsdImporter/bin/{build_variant}/usd_importer{env['suffix']}{env['SHLIBSUFFIX']}",
         source=sources,
     )
 
-# Link libraries
+
 env.Append(LIBS=[
     "usd_ms",
     "tbb",
@@ -63,18 +58,4 @@ env.Append(LIBS=[
     "tbbmalloc_proxy_debug",
 ])
 
-# Copy dependencies
-runtime_deps = [
-    os.path.join(usd_bin_path, "tbb.dll"),
-    os.path.join(usd_lib_path, "usd_ms.dll"),
-]
-
-dll_installs = env.Install(usd_importer_bin, runtime_deps)
-schemas_install = env.Install(usd_importer_bin, os.path.join(usd_lib_path, "usd"))
-
-# Make runtime deps depend on USD build
-env.Depends(dll_installs, usd_build)
-env.Depends(schemas_install, usd_build)
-env.Depends(library, usd_build)
-
-Default([library, dll_installs, schemas_install])
+Default(library)

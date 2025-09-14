@@ -14,12 +14,12 @@ ios.debug                   = "res://addons/UsdImporter/bin/usd_importer.ios.tem
 ios.debug.dev               = "res://addons/UsdImporter/bin/usd_importer.ios.template_debug.dev.xcframework"
 ios.release                 = "res://addons/UsdImporter/bin/usd_importer.ios.template_release.xcframework"
 
-windows.debug.x86_32        = "res://addons/UsdImporter/bin/usd_importer.windows.template_debug.x86_32.dll"
-windows.debug.dev.x86_32    = "res://addons/UsdImporter/bin/usd_importer.windows.template_debug.dev.x86_32.dll"
-windows.release.x86_32      = "res://addons/UsdImporter/bin/usd_importer.windows.template_release.x86_32.dll"
-windows.debug.x86_64        = "res://addons/UsdImporter/bin/usd_importer.windows.template_debug.x86_64.dll"
-windows.debug.dev.x86_64    = "res://addons/UsdImporter/bin/usd_importer.windows.template_debug.dev.x86_64.dll"
-windows.release.x86_64      = "res://addons/UsdImporter/bin/usd_importer.windows.template_release.x86_64.dll"
+windows.debug.x86_32        = "res://addons/UsdImporter/bin/debug/usd_importer.windows.template_debug.x86_32.dll"
+windows.debug.dev.x86_32    = "res://addons/UsdImporter/bin/debug/usd_importer.windows.template_debug.dev.x86_32.dll"
+windows.release.x86_32      = "res://addons/UsdImporter/bin/release/usd_importer.windows.template_release.x86_32.dll"
+windows.debug.x86_64        = "res://addons/UsdImporter/bin/debug/usd_importer.windows.template_debug.x86_64.dll"
+windows.debug.dev.x86_64    = "res://addons/UsdImporter/bin/debug/usd_importer.windows.template_debug.dev.x86_64.dll"
+windows.release.x86_64      = "res://addons/UsdImporter/bin/release/usd_importer.windows.template_release.x86_64.dll"
 
 linux.debug.x86_64          = "res://addons/UsdImporter/bin/usd_importer.linux.template_debug.x86_64.so"
 linux.debug.dev.x86_64      = "res://addons/UsdImporter/bin/usd_importer.linux.template_debug.dev.x86_64.so"
