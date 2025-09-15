@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from scons_hints import *
 
 
@@ -8,42 +9,29 @@ build_variant = "release"
 if env.get('target') == "template_debug":
     build_variant = "debug"
 
-usd_importer_bin = f"UsdImporter/bin/{build_variant}"
-
-usd_build_dir = f"usd/{build_variant}"
-usd_include_path = os.path.join(usd_build_dir, "include")
-usd_lib_path = os.path.join(usd_build_dir, "lib")
-usd_bin_path = os.path.join(usd_build_dir, "bin")
-
+usd_build_dir = Path('usd', build_variant)
+usd_include_path = usd_build_dir.joinpath("include")
+usd_lib_path = usd_build_dir.joinpath("lib")
 
 VariantDir(f'build/{build_variant}', 'src', duplicate=0)
-env.Append(CPPPATH=[f'build/{build_variant}', usd_include_path])
-env.Append(LIBPATH=[usd_lib_path])
+env.Append(CPPPATH=[f'build/{build_variant}', str(usd_include_path)])
+env.Append(LIBPATH=[str(usd_lib_path)])
 sources = Glob(f'build/{build_variant}/*.cpp')
 
 if env["platform"] == "macos":
     library = env.SharedLibrary(
-        f"UsdImporter/bin/{build_variant}/usd_importer.{env['platform']}.{env['target']}.framework/libgdexample.{env['platform']}.{env['target']}",
+        f"addons/{build_variant}/UsdImporter/bin/usd_importer.{env['platform']}.framework/libgdexample.{env['platform']}.{env['target']}",
         source=sources,
     )
-elif env["platform"] == "ios":
-    if env["ios_simulator"]:
-        library = env.StaticLibrary(
-            f"UsdImporter/bin/{build_variant}/usd_importer.{env['platform']}.{env['target']}.simulator.a",
-            source=sources,
-        )
-    else:
-        library = env.StaticLibrary(
-            f"UsdImporter/bin/{build_variant}/usd_importer.{env['platform']}.{env['target']}.a",
-            source=sources,
-        )
 else:
     library = env.SharedLibrary(
-        f"UsdImporter/bin/{build_variant}/usd_importer{env['suffix']}{env['SHLIBSUFFIX']}",
+        f"addons/{build_variant}/UsdImporter/bin/usd_importer.{env['platform']}.{env['arch']}{env['SHLIBSUFFIX']}",
         source=sources,
     )
 
 
+# usd_bin_path = usd_build_dir.joinpath("bin")
+# usd_bin_path.glob
 env.Append(LIBS=[
     "usd_ms",
     "tbb",

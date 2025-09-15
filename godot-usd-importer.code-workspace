@@ -5,6 +5,15 @@
 		}
 	],
 	"settings": {
-		"godotTools.editorPath.godot4": "Godot_v4.4.exe"
+		"godotTools.editorPath.godot4": "Godot_v4.4.exe",
+		"files.exclude": {
+			"__pycache__": true,
+			"**/.DS_Store": true,
+			"**/.git": true,
+			"**/.hg": true,
+			"**/.svn": true,
+			"**/Thumbs.db": true
+		},
+		"explorerExclude.backup": {}
 	}
 }

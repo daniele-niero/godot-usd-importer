@@ -1,0 +1,22 @@
+[configuration]
+
+entry_symbol = "ExtensionInit"
+compatibility_minimum = "4.4"
+reloadable = true
+
+[libraries]
+
+macos.debug                 = "res://addons/UsdImporter/bin/usd_importer.macos.framework"
+macos.release               = "res://addons/UsdImporter/bin/usd_importer.macos.framework"
+
+windows.debug.x86_32        = "res://addons/UsdImporter/bin/usd_importer.windows.x86_32.dll"
+windows.release.x86_32      = "res://addons/UsdImporter/bin/usd_importer.windows.x86_32.dll"
+windows.debug.x86_64        = "res://addons/UsdImporter/bin/usd_importer.windows.x86_64.dll"
+windows.release.x86_64      = "res://addons/UsdImporter/bin/usd_importer.windows.x86_64.dll"
+
+linux.debug.x86_64          = "res://addons/UsdImporter/bin/usd_importer.linux.x86_64.so"
+linux.release.x86_64        = "res://addons/UsdImporter/bin/usd_importer.linux.x86_64.so"
+linux.debug.arm64           = "res://addons/UsdImporter/bin/usd_importer.linux.arm64.so"
+linux.release.arm64         = "res://addons/UsdImporter/bin/usd_importer.linux.arm64.so"
+linux.debug.rv64            = "res://addons/UsdImporter/bin/usd_importer.linux.rv64.so"
+linux.release.rv64          = "res://addons/UsdImporter/bin/usd_importer.linux.rv64.so"
