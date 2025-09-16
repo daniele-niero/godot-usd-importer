@@ -1,0 +1,12 @@
+#usda 1.0
+
+def Xform "Root0" {
+    def Xform "Root1" {
+        def Xform "Root2" {
+        }
+    }
+
+    def Sphere "UsdSphere" {
+        
+    }
+}

@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://cy7c5hjorfnve"]
+
+[ext_resource type="PackedScene" uid="uid://b65n8dn123hay" path="res://source_usd/super_simple_geometry.usda" id="1_bw4jw"]
+[ext_resource type="Script" uid="uid://wlnyx6g4cm4s" path="res://code/tests/mesh_normals_debug.gd" id="2_wxqw8"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="super_simple_geometry" parent="." instance=ExtResource("1_bw4jw")]
+
+[node name="faceVarying" parent="super_simple_geometry" index="0"]
+transform = Transform3D(-0.676799, 0, -0.736168, 0, 1, 0, 0.736168, 0, -0.676799, -3.45381, 2.28804, 0)
+script = ExtResource("2_wxqw8")
+
+[node name="costant" parent="super_simple_geometry" index="1"]
+transform = Transform3D(-0.563843, 0, -0.825882, 0, 1, 0, 0.825882, 0, -0.563843, 0, 2.41932, 0)
+script = ExtResource("2_wxqw8")
+
+[node name="vertex" parent="super_simple_geometry" index="2"]
+transform = Transform3D(-0.662895, 0, -0.748713, 0, 1, 0, 0.748713, 0, -0.662895, -3.52738, 0, 0)
+script = ExtResource("2_wxqw8")
+
+[node name="uniform" parent="super_simple_geometry" index="3"]
+transform = Transform3D(-0.563843, 0, -0.825882, 0, 1, 0, 0.825882, 0, -0.563843, 0, 0, 0)
+script = ExtResource("2_wxqw8")
+
+[editable path="super_simple_geometry"]

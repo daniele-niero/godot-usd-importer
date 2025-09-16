@@ -1,4 +1,6 @@
-demo/*
+demo_project/.godot/*
+demo_project/*/*.uid
+demo_project/*/*.import
 .sconsign.dblite
 *.obj
 *.uid
@@ -14,3 +16,4 @@ bin/*
 UsdImporter/bin
 usd
 msvc_capture.log
+addons/*
