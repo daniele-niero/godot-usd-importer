@@ -17,7 +17,7 @@ def build_usd(args: argparse.Namespace, extension_dir: Path):
     variant = "release"
     if args.target == "debug":
         variant = "debug"
-    
+
     open_usd_root = Path("OpenUSD")
     usd_build_dir = Path(f"usd/{variant}")
 
@@ -48,7 +48,7 @@ def build_usd(args: argparse.Namespace, extension_dir: Path):
             shutil.rmtree(str(schemas_dest_dir))
         schemas_source_dir = usd_lib_path.joinpath('usd')
         shutil.copytree(str(schemas_source_dir), str(schemas_dest_dir))
-        
+
         # copy all shared libraries from usd_bin_path (most likely only one dll, since we built Usd as "monolithic")
         for dll_file in usd_lib_path.glob('*.dll'):
             shutil.copyfile(str(dll_file), str(extension_bin_dir.joinpath(dll_file.name)))
@@ -72,14 +72,14 @@ def build_gdextension(args: argparse.Namespace, extension_dir: Path):
     if args.target == "debug":
         scons_target = "template_debug"
         extra_cmd_args = [
-            # 'use_hot_reload=yes', 
-            # 'optimize=debug', 
+            # 'use_hot_reload=yes',
+            # 'optimize=debug',
             'debug_symbols=yes'
         ]
     else:
         scons_target = "template_release"
         extra_cmd_args = [
-            # 'optimize=speed', 
+            # 'optimize=speed',
             # 'debug_symbols=no'
         ]
 
@@ -91,7 +91,7 @@ def build_gdextension(args: argparse.Namespace, extension_dir: Path):
 
         scons_cmd.append('--clean')
         run(scons_cmd)
-        
+
         print("\n✅ UsdImporter Cleaned Successfully.\n")
 
     else:
@@ -102,11 +102,35 @@ def build_gdextension(args: argparse.Namespace, extension_dir: Path):
         print("\n✅ UsdImporter Built Successfully.\n")
 
 
+def create_symlink(target: Path, link_path: Path):
+    try:
+        # Remove old symlink or directory if it exists
+        if link_path.is_symlink() or link_path.exists():
+            if link_path.is_dir() and not link_path.is_symlink():
+                # Remove directory tree if it's a real folder
+                shutil.rmtree(link_path)
+            else:
+                link_path.unlink()
+
+        # Ensure parent directories exist
+        link_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Create symlink
+
+        link_path.symlink_to(target.resolve(), target_is_directory=target.is_dir())
+        print(f"Symlink created: {link_path} -> {target}")
+
+    except OSError as e:
+        print(f"Error creating symlink: {e}", file=sys.stderr)
+
+
 def main(args: argparse.Namespace):
     extension_dir = Path('addons', args.target, 'UsdImporter')
 
     build_usd(args, extension_dir)
     build_gdextension(args, extension_dir)
+
+    create_symlink(extension_dir, Path('demo_project', 'addons', 'UsdImporter'))
 
     print("\n✅ Build finished.")
 
@@ -119,7 +143,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--force-build-usd", action="store_true", default=False,
                         help="Build USD even if it was build already")
-    
+
     parser.add_argument("--clean", action="store_true", default=False,
                         help="Clean the built extension for the specified target")
 

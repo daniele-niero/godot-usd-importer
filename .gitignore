@@ -1,6 +1,8 @@
-demo_project/.godot/*
-demo_project/*/*.uid
-demo_project/*/*.import
+/demo_project/.godot/*
+/demo_project/addons/*
+/demo_project/**/*.uid
+/demo_project/**/*.import
+
 .sconsign.dblite
 *.obj
 *.uid
