@@ -88,7 +88,7 @@ Error USDImporter::_import(
         const String &source_file, const String &save_path, const Dictionary &options,
         const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const
 {
-    if (godot_path.begins_with("res://addons"))
+    if (source_file.begins_with("res://addons"))
         return OK;
 
     Ref<PackedScene> scene;
