@@ -4,8 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/src/**",
-                "${workspaceFolder}/usd/release/include",
-                // "${workspaceFolder}/usd_build/debug/include",
+                // "${workspaceFolder}/usd/release/include",
+                "${workspaceFolder}/usd/debug/include",
                 "${workspaceFolder}/godot-cpp/**"
             ],
             "windowsSdkVersion": "10.0.22621.0",

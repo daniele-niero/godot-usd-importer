@@ -29,7 +29,6 @@ def build_usd(args: argparse.Namespace, extension_dir: Path):
             sys.executable, str(build_usd_script),
             "--no-python", "--no-examples", "--no-tutorials", "--no-tools", "--no-materialx", "--no-imaging",
             "--build-monolithic",
-            "--inst", f"{usd_build_dir}/INSTALLATION",
             f"--build-variant", variant,
             str(usd_build_dir)
         ]
@@ -55,8 +54,11 @@ def build_usd(args: argparse.Namespace, extension_dir: Path):
             shutil.copyfile(str(dll_file), str(extension_bin_dir.joinpath(dll_file.name)))
 
         # # tbb is a dependency of Usd's dll
-        tbb_dll = usd_bin_path.joinpath('tbb.dll')
-        shutil.copyfile(str(tbb_dll), str(extension_bin_dir.joinpath('tbb.dll')))
+        if variant == 'debug':
+            tbb_dll = usd_bin_path.joinpath('tbb_debug.dll')
+        else:
+            tbb_dll = usd_bin_path.joinpath('tbb.dll')
+        shutil.copyfile(str(tbb_dll), str(extension_bin_dir.joinpath(tbb_dll.name)))
 
         print("\n✅ Installed USD in Extesnion Directory successfully.\n")
 
@@ -69,10 +71,17 @@ def build_gdextension(args: argparse.Namespace, extension_dir: Path):
 
     if args.target == "debug":
         scons_target = "template_debug"
-        extra_cmd_args = ['use_hot_reload=yes', 'optimize=debug', 'debug_symobols=yes']
+        extra_cmd_args = [
+            # 'use_hot_reload=yes', 
+            # 'optimize=debug', 
+            'debug_symbols=yes'
+        ]
     else:
         scons_target = "template_release"
-        extra_cmd_args = ['optimize=speed', 'debug_symobols=no']
+        extra_cmd_args = [
+            # 'optimize=speed', 
+            # 'debug_symbols=no'
+        ]
 
     scons_cmd = ["scons", f"platform=windows", f"target={scons_target}"] + extra_cmd_args
 

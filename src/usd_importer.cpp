@@ -86,6 +86,8 @@ bool USDImporter::_can_import_threaded() const {
 
 Error USDImporter::_import(const String &source_file, const String &save_path, const Dictionary &options, 
                   const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const { 
+
+                      
     Ref<PackedScene> scene;
     scene.instantiate();
 
@@ -97,6 +99,8 @@ Error USDImporter::_import(const String &source_file, const String &save_path, c
     print_line("Resolved USD file path: " + godot_path);
     
     // Attempt to open the USD stage
+    std::string pippo = std::string(godot_path.utf8().get_data());
+    std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << pippo << std::endl;;
     UsdStageRefPtr stage = UsdStage::Open(std::string(godot_path.utf8().get_data()));
     if (!stage) {
         print_error("Failed to open USD stage: " + godot_path);
