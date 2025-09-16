@@ -84,10 +84,13 @@ bool USDImporter::_can_import_threaded() const {
     return false; // USD import is not threaded for now
 }
 
-Error USDImporter::_import(const String &source_file, const String &save_path, const Dictionary &options, 
-                  const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const { 
+Error USDImporter::_import(
+        const String &source_file, const String &save_path, const Dictionary &options,
+        const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const
+{
+    if (godot_path.begins_with("res://addons"))
+        return OK;
 
-                      
     Ref<PackedScene> scene;
     scene.instantiate();
 
@@ -97,7 +100,7 @@ Error USDImporter::_import(const String &source_file, const String &save_path, c
         godot_path = ProjectSettings::get_singleton()->globalize_path(godot_path);
     }
     print_line("Resolved USD file path: " + godot_path);
-    
+
     // Attempt to open the USD stage
     std::string pippo = std::string(godot_path.utf8().get_data());
     std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << pippo << std::endl;;
@@ -112,7 +115,7 @@ Error USDImporter::_import(const String &source_file, const String &save_path, c
 
     UsdToGodotVisitor visitor;
     Node3D* root_node = visitor.build_godot_scene(stage, root_name);
-    
+
     scene->pack(root_node);
     String file_path = save_path + String(".") + _get_save_extension();
     print_line("Saving scene to: " + save_path);

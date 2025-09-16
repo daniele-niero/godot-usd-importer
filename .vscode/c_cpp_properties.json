@@ -4,7 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/src/**",
-                // "${workspaceFolder}/usd/release/include",
+                "${workspaceFolder}/usd/release/include",
                 "${workspaceFolder}/usd/debug/include",
                 "${workspaceFolder}/godot-cpp/**"
             ],

@@ -74,6 +74,7 @@ def build_gdextension(args: argparse.Namespace, extension_dir: Path):
         extra_cmd_args = [
             # 'use_hot_reload=yes',
             # 'optimize=debug',
+            'use_static_cpp=no',
             'debug_symbols=yes'
         ]
     else:
