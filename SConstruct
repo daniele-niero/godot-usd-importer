@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from scons_hints import *
+from terminal_ansi import Terminal
 
 
 env = SConscript("godot-cpp/SConstruct")

@@ -5,13 +5,15 @@ import sys
 import platform
 import shutil
 from pathlib import Path
+from terminal_ansi import Terminal
+
 
 def run(cmd, cwd=None):
-    print(f"\n>>> Running: {' '.join(cmd)}\n")
     result = subprocess.run(cmd, cwd=cwd)
     if result.returncode != 0:
-        print(f"Command failed with exit code {result.returncode}: {' '.join(cmd)}")
+        Terminal.Red(f"❗Command failed with exit code {result.returncode}: {' '.join(cmd)}")
         sys.exit(result.returncode)
+
 
 def build_usd(args: argparse.Namespace, extension_dir: Path):
     variant = "release"
@@ -21,21 +23,33 @@ def build_usd(args: argparse.Namespace, extension_dir: Path):
     open_usd_root = Path("OpenUSD")
     usd_build_dir = Path(f"usd/{variant}")
 
-    build_usd_script = open_usd_root.joinpath("build_scripts", "build_usd.py")
+    if args.clean:
+        Terminal.Blue(f"Clean Usd {variant} from {usd_build_dir}")
+        shutil.rmtree(str(usd_build_dir))
+        return
 
-    if usd_build_dir.exists() == False or args.force_build_usd:
-        print(f'---------- Build USD ----------')
+    if args.force_build_usd:
+        shutil.rmtree(str(usd_build_dir))
+
+    build_usd_script = open_usd_root.joinpath("build_scripts", "build_usd.py")
+    need_installing = args.install_usd_libraries
+
+    if usd_build_dir.exists() == False:
+        need_installing = True
+        Terminal.Blue(f'⚙️  Building USD {variant} in ".\{usd_build_dir}" (this will take some time) ...')
         usd_cmd = [
             sys.executable, str(build_usd_script),
             "--no-python", "--no-examples", "--no-tutorials", "--no-tools", "--no-materialx", "--no-imaging",
+            "--quiet",
             "--build-monolithic",
             f"--build-variant", variant,
             str(usd_build_dir)
         ]
         run(usd_cmd)
-        print("\n✅ USD Build finished successfully.\n")
+        Terminal.Green("\n✅ USD Build finished successfully.\n")
 
-        print(f'---------- Install USD in Extension Directory ----------')
+    if need_installing:
+        Terminal.Blue(f'📦 Install USD in Extension Directory ...')
 
         usd_bin_path = usd_build_dir.joinpath("bin")
         usd_lib_path = usd_build_dir.joinpath("lib")
@@ -43,24 +57,33 @@ def build_usd(args: argparse.Namespace, extension_dir: Path):
         extension_bin_dir = extension_dir.joinpath('bin')
 
         # copy USD folder (schemas and such)
+        Terminal.Default('Copying "usd" folder (schemas and such) ...')
         schemas_dest_dir = extension_bin_dir.joinpath('usd')
         if schemas_dest_dir.exists():
             shutil.rmtree(str(schemas_dest_dir))
         schemas_source_dir = usd_lib_path.joinpath('usd')
         shutil.copytree(str(schemas_source_dir), str(schemas_dest_dir))
+        Terminal.Inline('Copying "usd" folder (schemas and such) Done!')
 
         # copy all shared libraries from usd_bin_path (most likely only one dll, since we built Usd as "monolithic")
         for dll_file in usd_lib_path.glob('*.dll'):
+            Terminal.Inline(f'Copying {dll_file} folder (schemas and such) ...')
             shutil.copyfile(str(dll_file), str(extension_bin_dir.joinpath(dll_file.name)))
+            Terminal.Inline(f'Copying {dll_file} folder (schemas and such) Done!')
 
-        # # tbb is a dependency of Usd's dll
+        # tbb is a dependency of Usd's dll
         if variant == 'debug':
-            tbb_dll = usd_bin_path.joinpath('tbb_debug.dll')
+            for dll_file in usd_bin_path.glob('*.dll'):
+                Terminal.Inline(f'Copying {dll_file} folder (schemas and such) ...')
+                shutil.copyfile(str(dll_file), str(extension_bin_dir.joinpath(dll_file.name)))
+                Terminal.Inline(f'Copying {dll_file} folder (schemas and such) Done!')
         else:
             tbb_dll = usd_bin_path.joinpath('tbb.dll')
-        shutil.copyfile(str(tbb_dll), str(extension_bin_dir.joinpath(tbb_dll.name)))
-
-        print("\n✅ Installed USD in Extesnion Directory successfully.\n")
+            Terminal.Inline(f'Copying {tbb_dll} folder (schemas and such) ...')
+            shutil.copyfile(str(tbb_dll), str(extension_bin_dir.joinpath(tbb_dll.name)))
+            Terminal.Inline(f'Copying {tbb_dll} folder (schemas and such) Done!')
+            
+        Terminal.Green("\n✅ Installed USD in Extesnion Directory successfully.\n")
 
 
 def build_gdextension(args: argparse.Namespace, extension_dir: Path):
@@ -88,19 +111,16 @@ def build_gdextension(args: argparse.Namespace, extension_dir: Path):
 
 
     if args.clean:
-        print(f'---------- Clean UsdImporter ----------')
+        Terminal.Blue(f'Clean UsdImporter')
 
         scons_cmd.append('--clean')
         run(scons_cmd)
-
-        print("\n✅ UsdImporter Cleaned Successfully.\n")
-
     else:
-        print(f'---------- Build UsdImporter ----------')
+        Terminal.Blue(f'⚙️  Buiding UsdImporter ...')
 
         run(scons_cmd)
 
-        print("\n✅ UsdImporter Built Successfully.\n")
+        Terminal.Green("\n✅ UsdImporter Built Successfully.\n")
 
 
 def create_symlink(target: Path, link_path: Path):
@@ -108,7 +128,6 @@ def create_symlink(target: Path, link_path: Path):
         # Remove old symlink or directory if it exists
         if link_path.is_symlink() or link_path.exists():
             if link_path.is_dir() and not link_path.is_symlink():
-                # Remove directory tree if it's a real folder
                 shutil.rmtree(link_path)
             else:
                 link_path.unlink()
@@ -116,13 +135,11 @@ def create_symlink(target: Path, link_path: Path):
         # Ensure parent directories exist
         link_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # Create symlink
-
         link_path.symlink_to(target.resolve(), target_is_directory=target.is_dir())
-        print(f"Symlink created: {link_path} -> {target}")
+        Terminal.Green(f"Symlink created: {link_path} -> {target}")
 
     except OSError as e:
-        print(f"Error creating symlink: {e}", file=sys.stderr)
+        Terminal.Red(f"❗Error creating symlink in demo_project: {e}", file=sys.stderr)
 
 
 def main(args: argparse.Namespace):
@@ -130,10 +147,10 @@ def main(args: argparse.Namespace):
 
     build_usd(args, extension_dir)
     build_gdextension(args, extension_dir)
+    if args.no_symlink is False:
+        create_symlink(extension_dir, Path('demo_project', 'addons', 'UsdImporter'))
 
-    create_symlink(extension_dir, Path('demo_project', 'addons', 'UsdImporter'))
-
-    print("\n✅ Build finished.")
+    Terminal.Green("\n✅ BUILD FINISHED!.")
 
 
 if __name__ == "__main__":
@@ -144,9 +161,15 @@ if __name__ == "__main__":
 
     parser.add_argument("--force-build-usd", action="store_true", default=False,
                         help="Build USD even if it was build already")
+    
+    parser.add_argument("--install-usd-libraries", action="store_true", default=False,
+                        help="Copy again USD's library along side the builded extension")
 
     parser.add_argument("--clean", action="store_true", default=False,
                         help="Clean the built extension for the specified target")
+    
+    parser.add_argument("--no-symlink", action="store_true", default=False,
+                        help="Don't symlink the compiled extension into demo-project's addons folder")
 
     args = parser.parse_args()
     main(args)
