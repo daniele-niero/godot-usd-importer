@@ -113,7 +113,7 @@ Error USDImporter::_import(
     // name root node as the usd file name without extension
     String root_name = godot_path.get_file().get_basename();
 
-    UsdToGodotVisitor visitor;
+    UsdVisitor visitor = UsdVisitor();
     Node3D* root_node = visitor.build_godot_scene(stage, root_name);
 
     scene->pack(root_node);
