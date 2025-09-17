@@ -9,6 +9,10 @@ env = SConscript("godot-cpp/SConstruct")
 build_variant = "release"
 if env.get('target') == "template_debug":
     build_variant = "debug"
+    # Remove /MD if present
+    env['CCFLAGS'] = [flag for flag in env['CCFLAGS'] if flag not in ['/MD', '/MT']]
+    # Add /MDd
+    env.Append(CCFLAGS=["/MDd"])
 
 usd_build_dir = Path('usd', build_variant)
 usd_include_path = usd_build_dir.joinpath("include")

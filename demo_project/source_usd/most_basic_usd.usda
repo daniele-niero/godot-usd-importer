@@ -9,4 +9,8 @@ def Xform "Root0" {
     def Sphere "UsdSphere" {
         
     }
+
+    def Cube "UsdCube" {
+
+    }
 }

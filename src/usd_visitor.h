@@ -1,32 +1,21 @@
 #pragma once
 
-#include <pxr/usd/usd/stage.h>
-#include <pxr/usd/usd/prim.h>
-#include <pxr/base/tf/token.h>
 #include <pxr/base/tf/hash.h>
+#include <pxr/base/tf/token.h>
+#include <pxr/usd/usd/prim.h>
+#include <pxr/usd/usd/stage.h>
+
+#include <godot_cpp/classes/node3d.hpp>
 
 #include <functional>
 #include <unordered_map>
 
-#include <godot_cpp/classes/node3d.hpp>
 
 PXR_NAMESPACE_USING_DIRECTIVE
-
-// // Make TfToken hashable for std::unordered_map
-// namespace std {
-//     template <>
-//     struct hash<pxr::TfToken> {
-//         size_t operator()(const pxr::TfToken &t) const noexcept {
-//             return std::hash<std::string>()(t.GetString());
-//         }
-//     };
-// }
-
-
 namespace godot {
 
 using PrimImportDelegate = std::function<Node3D*(const UsdPrim&, Node3D*)>;
-using PrimImportDelegateMap = std::unordered_map<TfToken, PrimImportDelegate>;
+using PrimImportDelegateMap = std::unordered_map<TfToken, PrimImportDelegate, TfToken::HashFunctor>;
 
 class UsdVisitorRegistry {
 public:

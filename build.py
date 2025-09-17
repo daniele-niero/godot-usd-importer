@@ -36,7 +36,7 @@ def build_usd(args: argparse.Namespace, extension_dir: Path):
 
     if usd_build_dir.exists() == False:
         need_installing = True
-        Terminal.Blue(f'⚙️  Building USD {variant} in ".\{usd_build_dir}" (this will take some time) ...')
+        Terminal.Blue(f'⚙️  Building USD {variant} in "{usd_build_dir}" (this will take some time) ...')
         usd_cmd = [
             sys.executable, str(build_usd_script),
             "--no-python", "--no-examples", "--no-tutorials", "--no-tools", "--no-materialx", "--no-imaging",
@@ -63,6 +63,7 @@ def build_usd(args: argparse.Namespace, extension_dir: Path):
             shutil.rmtree(str(schemas_dest_dir))
         schemas_source_dir = usd_lib_path.joinpath('usd')
         shutil.copytree(str(schemas_source_dir), str(schemas_dest_dir))
+        open(schemas_dest_dir.joinpath('.gdignore'), 'w').close()
         Terminal.Inline('Copying "usd" folder (schemas and such) Done!')
 
         # copy all shared libraries from usd_bin_path (most likely only one dll, since we built Usd as "monolithic")
@@ -107,7 +108,9 @@ def build_gdextension(args: argparse.Namespace, extension_dir: Path):
             # 'debug_symbols=no'
         ]
 
-    scons_cmd = ["scons", f"platform=windows", f"target={scons_target}"] + extra_cmd_args
+    Terminal.BoldGreen("scons", f"platform={system}", f"target={scons_target}", *extra_cmd_args)
+
+    scons_cmd = ["scons", f"platform={system}", f"target={scons_target}"] + extra_cmd_args
 
 
     if args.clean:

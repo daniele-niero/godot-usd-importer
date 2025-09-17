@@ -15,6 +15,11 @@
 PXR_NAMESPACE_USING_DIRECTIVE
 using namespace godot;
 
+// #ifdef _DEBUG
+// 	TfDebug::SetDebugSymbols(true);
+//     TfDebug::SetTraceFile("usd_trace.log");
+// #endif
+
 static void register_import_delegates() {
 	UsdVisitorRegistry& registry = UsdVisitorRegistry::get_instance();
 

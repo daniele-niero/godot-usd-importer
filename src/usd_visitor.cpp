@@ -22,17 +22,18 @@ const PrimImportDelegateMap& UsdVisitorRegistry::get_delegates() const {
 void UsdVisitor::visit(const UsdPrim& prim, Node3D* parent_node) {
     const PrimImportDelegateMap& delegates = UsdVisitorRegistry::get_instance().get_delegates();
 
-    Node3D* new_parent;
+    Node3D* new_node;
 
     auto it = delegates.find(prim.GetTypeName());
     if (it != delegates.end()) {
-        new_parent = it->second(prim, parent_node); // Call delegate
+        new_node = it->second(prim, parent_node); // Call delegate
+        parent_node->add_child(new_node);
     } else {
-        new_parent = parent_node;
+        new_node = parent_node;
     }
 
     for (auto& child : prim.GetChildren()) {
-        visit(child, new_parent);
+        visit(child, new_node);
     }
 }
 

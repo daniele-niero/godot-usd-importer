@@ -101,10 +101,12 @@ Error USDImporter::_import(
     }
     print_line("Resolved USD file path: " + godot_path);
 
+    // Convert Godot String to std::string safely
+    CharString path_utf8 = godot_path.utf8();       // keep the CharString alive
+    std::string std_path(path_utf8.get_data());     // copy into std::string
+
     // Attempt to open the USD stage
-    std::string pippo = std::string(godot_path.utf8().get_data());
-    std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << pippo << std::endl;;
-    UsdStageRefPtr stage = UsdStage::Open(std::string(godot_path.utf8().get_data()));
+    UsdStageRefPtr stage = UsdStage::Open("C:/Users/danie/Development/godot-usd-importer/demo_project/source_usd/most_basic_usd.usda");
     if (!stage) {
         print_error("Failed to open USD stage: " + godot_path);
         return ERR_CANT_OPEN;
