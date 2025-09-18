@@ -1,4 +1,13 @@
 {
     "C_Cpp.default.compilerPath": "C:/Users/daniele.niero/AppData/Local/Programs/Swift/Toolchains/6.1.2+Asserts/usr/bin/clang.exe",
-    "files.exclude": {}
+    "files.exclude": {},
+    "clangd.arguments": [
+    "--compile-commands-dir=${workspaceFolder}",
+    "--clang-tidy",
+    "--all-scopes-completion",
+    "--header-insertion=never",
+    "-extra-arg=-Wall",
+    "-extra-arg=-Wextra",
+    "-extra-arg=-Wunused"
+]
 }

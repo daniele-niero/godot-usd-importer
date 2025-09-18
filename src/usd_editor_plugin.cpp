@@ -1,4 +1,5 @@
 #include "usd_editor_plugin.h"
+#include "usd_importer.h"
 
 namespace godot {
 

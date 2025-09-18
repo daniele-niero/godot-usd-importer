@@ -1,5 +1,6 @@
 #include "initialization.h"
 #include "usd_visitor.h"
+#include "basic_import_delegates.h"
 #include "mesh_import_delegates.h"
 
 #include "usd_importer.h"
@@ -23,7 +24,9 @@ using namespace godot;
 static void register_import_delegates() {
 	UsdVisitorRegistry& registry = UsdVisitorRegistry::get_instance();
 
-	registry.register_delegate(TfToken("Cube"), import_cube);
+	registry.register_delegate(TfToken("UsdGeomXformable"), import_xformable);
+	registry.register_delegate(TfToken("UsdGeomMesh"), import_mesh);
+	register_basic_solids();
 }
 
 

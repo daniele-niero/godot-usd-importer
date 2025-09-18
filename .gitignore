@@ -3,6 +3,10 @@
 /demo_project/**/*.uid
 /demo_project/**/*.import
 
+.cache/*
+
+compile_commands.json
+
 .sconsign.dblite
 *.obj
 *.uid

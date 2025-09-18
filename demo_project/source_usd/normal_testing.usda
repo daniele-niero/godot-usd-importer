@@ -6,7 +6,6 @@
     upAxis = "Z"
 )
 
-
 def Mesh "faceVarying"
 {
     float3[] extent = [(-1, -1, -1), (1, 1, 1)]
@@ -20,6 +19,24 @@ def Mesh "faceVarying"
         interpolation = "faceVarying"
     )
     uniform token subdivisionScheme = "none"
+    float3 xformOp:rotateXYZ = (0, -49.802933, 0)
+    double3 xformOp:translate = (0, 0, 3.3080982091917672)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+}
+
+def Mesh "withoutNormals"
+{
+    float3[] extent = [(-1, -1, -1), (1, 1, 1)]
+    int[] faceVertexCounts = [4, 3]
+    int[] faceVertexIndices = [0, 2, 4, 1, 3, 4, 2]
+    point3f[] points = [(1, 1, 1), (1, -1, 1), (-1, 1, 1), (-1, 1, -1), (-1, -1, 1)]
+    texCoord2f[] primvars:UVMap = [(0.625, 0.5), (0.875, 0.5), (0.875, 0.75), (0.625, 0.75), (0.375, 0.25), (0.625, 0), (0.625, 0.25)] (
+        interpolation = "faceVarying"
+    )
+    uniform token subdivisionScheme = "none"
+    float3 xformOp:rotateXYZ = (0, -49.802933, 0)
+    double3 xformOp:translate = (0, -2.9949043793066137, 0)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
 }
 
 def Mesh "costant"
@@ -35,6 +52,9 @@ def Mesh "costant"
         interpolation = "faceVarying"
     )
     uniform token subdivisionScheme = "none"
+    float3 xformOp:rotateXYZ = (0, -49.802933, 0)
+    double3 xformOp:translate = (0, 3.120592437650795, 0)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
 }
 
 def Mesh "vertex"
@@ -50,6 +70,9 @@ def Mesh "vertex"
         interpolation = "faceVarying"
     )
     uniform token subdivisionScheme = "none"
+    float3 xformOp:rotateXYZ = (0, -49.802933, 0)
+    double3 xformOp:translate = (0, 0, -3.31988074828028)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
 }
 
 def Mesh "uniform"
@@ -65,7 +88,6 @@ def Mesh "uniform"
         interpolation = "faceVarying"
     )
     uniform token subdivisionScheme = "none"
+    float3 xformOp:rotateXYZ = (0, -49.802933, 0)
+    uniform token[] xformOpOrder = ["xformOp:rotateXYZ"]
 }
-
-
-

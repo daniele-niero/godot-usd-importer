@@ -37,7 +37,7 @@ public:
     int32_t                 _get_format_version()        const override;
     bool                    _get_option_visibility(const String &p_path, const StringName &option_name, const Dictionary &options) const override;
     bool                    _can_import_threaded()       const override;
-    Error                   _import(const String &source_file, const String &save_path, const Dictionary &options, 
+    Error                   _import(const String &source_file, const String &save_path, const Dictionary &options,
                                     const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const override;
 };
 

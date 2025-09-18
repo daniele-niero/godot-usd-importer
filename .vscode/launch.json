@@ -19,7 +19,7 @@
             "stopAtEntry": false,
             // "cwd": "C:/path/to/GodotEditor.exe/folder",
             "environment": [],
-            "externalConsole": false,
+            "console": false,
         }
     ]
 }

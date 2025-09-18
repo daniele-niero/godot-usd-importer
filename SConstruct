@@ -5,6 +5,7 @@ from terminal_ansi import Terminal
 
 
 env = SConscript("godot-cpp/SConstruct")
+env.Tool('compilation_db')
 
 build_variant = "release"
 if env.get('target') == "template_debug":
@@ -52,3 +53,6 @@ env.Append(LIBS=[
 ])
 
 Default(library)
+env.CompilationDatabase()
+
+

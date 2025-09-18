@@ -1,30 +1,17 @@
-[gd_scene load_steps=4 format=3 uid="uid://cy7c5hjorfnve"]
+[gd_scene load_steps=3 format=3 uid="uid://cy7c5hjorfnve"]
 
-[ext_resource type="PackedScene" uid="uid://ixte8f53hxwv" path="res://source_usd/super_simple_geometry.usda" id="1_bw4jw"]
-[ext_resource type="Script" uid="uid://wlnyx6g4cm4s" path="res://code/tests/mesh_normals_debug.gd" id="2_wxqw8"]
-[ext_resource type="PackedScene" uid="uid://dhx0g7cbia6u" path="res://source_usd/most_basic_usd.usda" id="3_wxqw8"]
+[ext_resource type="PackedScene" uid="uid://ce412a3i6ttxt" path="res://source_usd/normal_testing.usda" id="1_bw4jw"]
+[ext_resource type="Script" uid="uid://b1com7djvsmkc" path="res://code/tests/mesh_normals_debug.gd" id="2_d44gx"]
 
 [node name="Node3D" type="Node3D"]
 
-[node name="super_simple_geometry" parent="." instance=ExtResource("1_bw4jw")]
+[node name="normal_testing" parent="." instance=ExtResource("1_bw4jw")]
 
-[node name="faceVarying" parent="super_simple_geometry" index="0"]
-transform = Transform3D(-0.824047, 0, -0.566521, 0, 1, 0, 0.566521, 0, -0.824047, -3.4107, 2.28804, 0.450997)
-script = ExtResource("2_wxqw8")
+[node name="faceVarying" parent="normal_testing" index="0"]
+script = ExtResource("2_d44gx")
 
-[node name="costant" parent="super_simple_geometry" index="1"]
-transform = Transform3D(-0.733967, 0, -0.679185, 0, 1, 0, 0.679185, 0, -0.733967, -0.0440353, 2.41932, 1.22194)
-script = ExtResource("2_wxqw8")
+[node name="withoutNormals" parent="normal_testing" index="1"]
+transform = Transform3D(-0.76491, -0.403096, -0.502421, -0.620559, 0.670254, 0.40702, 0.172682, 0.623115, -0.762829, 0, -2.9949, 0)
+script = ExtResource("2_d44gx")
 
-[node name="vertex" parent="super_simple_geometry" index="2"]
-transform = Transform3D(-0.813294, 0, -0.581853, 0, 1, 0, 0.581853, 0, -0.813294, -3.48241, 0, 0.434574)
-script = ExtResource("2_wxqw8")
-
-[node name="uniform" parent="super_simple_geometry" index="3"]
-transform = Transform3D(-0.733967, 0, -0.679185, 0, 1, 0, 0.679185, 0, -0.733967, -0.0440353, 0, 1.22194)
-script = ExtResource("2_wxqw8")
-
-[node name="most_basic_usd" parent="." instance=ExtResource("3_wxqw8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.63807)
-
-[editable path="super_simple_geometry"]
+[editable path="normal_testing"]

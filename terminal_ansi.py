@@ -6,11 +6,13 @@ class Terminal(enum.Enum):
     Inline      = "\r\033[2K" # \r moves to the start, \033[2K clears the line
     Default     = "\033[0m"
     Green       = "\033[92m"
+    Yellow      = "\033[93m"
     Blue        = "\033[34m"
     Red         = "\033[31m"
 
     Bold        = "\033[1m"
     BoldGreen   = "\033[1;92m"
+    BoldYellow  = "\033[1;93m"
     BoldBlue    = "\033[1;34m"
     BoldRed     = "\033[1;31m"
 
@@ -21,7 +23,7 @@ class Terminal(enum.Enum):
             return self.value
         else:
             return ''
-    
+
     def __call__(self, *values):
         if self is Terminal.Inline:
             print(self, *' '.join(values), "\033[0m", sep="", end="", flush=True)

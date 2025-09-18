@@ -17,6 +17,7 @@ USDImporter::USDImporter() = default;
 USDImporter::~USDImporter() = default;
 
 String USDImporter::_get_importer_name() const {
+    int pippo = 0;
     return "usd.importer";
 }
 
@@ -106,7 +107,7 @@ Error USDImporter::_import(
     std::string std_path(path_utf8.get_data());     // copy into std::string
 
     // Attempt to open the USD stage
-    UsdStageRefPtr stage = UsdStage::Open("C:/Users/danie/Development/godot-usd-importer/demo_project/source_usd/most_basic_usd.usda");
+    UsdStageRefPtr stage = UsdStage::Open(std_path);
     if (!stage) {
         print_error("Failed to open USD stage: " + godot_path);
         return ERR_CANT_OPEN;

@@ -14,6 +14,11 @@
 			"**/.svn": true,
 			"**/Thumbs.db": true
 		},
-		"explorerExclude.backup": {}
+		"explorerExclude.backup": {},
+		"files.associations": {
+			"utility": "cpp",
+			"xhash": "cpp",
+			"type_traits": "cpp"
+		}
 	}
 }

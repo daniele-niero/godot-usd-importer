@@ -1,7 +1,6 @@
 #pragma once
 
 #include <godot_cpp/classes/editor_plugin.hpp>
-#include "usd_importer.h"
 
 namespace godot {
 
