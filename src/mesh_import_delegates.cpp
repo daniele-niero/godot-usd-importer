@@ -1,36 +1,26 @@
 #include "mesh_import_delegates.h"
 #include "basic_import_delegates.h"
+#include "usd_visitor.h"
+#include "utils.h"
+
 #include "godot_cpp/classes/mesh_data_tool.hpp"
 #include "godot_cpp/classes/surface_tool.hpp"
 #include "godot_cpp/core/print_string.hpp"
-#include "pxr/usd/usdGeom/mesh.h"
-#include "usd_visitor.h"
-
 #include <godot_cpp/classes/mesh.hpp>
 #include <godot_cpp/classes/mesh_instance3d.hpp>
-// #include <godot_cpp/classes/array_mesh.hpp>
-// #include <godot_cpp/classes/primitive_mesh.hpp>
-// #include <pxr/base/gf/vec3f.h>
 #include <godot_cpp/classes/box_mesh.hpp>
 #include <godot_cpp/classes/sphere_mesh.hpp>
 #include <godot_cpp/classes/cylinder_mesh.hpp>
 #include <godot_cpp/classes/capsule_mesh.hpp>
-// #include <godot_cpp/core/class_db.hpp>
-// #include <godot_cpp/variant/utility_functions.hpp>
-// #include <godot_cpp/classes/standard_material3d.hpp>
 
-// #include <godot_cpp/variant/utility_functions.hpp>
-// #include <godot_cpp/classes/standard_material3d.hpp>
-
-// #include <pxr/usd/usdGeom/gprim.h>
 #include <pxr/usd/usdGeom/cube.h>
 #include <pxr/usd/usdGeom/sphere.h>
 #include <pxr/usd/usdGeom/cone.h>
 #include <pxr/usd/usdGeom/cylinder.h>
 #include <pxr/usd/usdGeom/capsule.h>
-// #include <pxr/usd/usdGeom/mesh.h>
-
+#include "pxr/usd/usdGeom/mesh.h"
 #include <pxr/usd/usdGeom/primvarsAPI.h>
+
 
 PXR_NAMESPACE_USING_DIRECTIVE
 namespace godot {
@@ -143,45 +133,6 @@ void register_basic_solids() {
     registry.register_delegate(TfToken("UsdGeomCapsule"), import_capsule);
 }
 
-// Helpers to get primvars as arrays of the data they contains
-
-static VtArray<GfVec3f> get_primvar_vec3f_array(const UsdGeomPrimvar& primvar) {
-    VtArray<GfVec3f> array;
-    primvar.Get(&array);
-    return array;
-}
-
-static VtArray<GfVec2f> get_primvar_vec2f_array(const UsdGeomPrimvar& primvar) {
-    VtArray<GfVec2f> array;
-    primvar.Get(&array);
-    return array;
-}
-
-// static VtArray<GfVec4f> get_primvar_color_array(const UsdGeomPrimvar& primvar) {
-//     VtArray<GfVec4f> array4;
-//     if (primvar.Get(&array4) && !array4.empty()) {
-//         return array4;
-//     }
-//     VtArray<GfVec3f> array3;
-//     if (primvar.Get(&array3) && !array3.empty()) {
-//         VtArray<GfVec4f> result;
-//         result.resize(array3.size());
-//         for (size_t i = 0; i < array3.size(); ++i) {
-//             const GfVec3f& v = array3[i];
-//             result[i] = GfVec4f(v[0], v[1], v[2], 1.0f);
-//         }
-//         return result;
-//     }
-//     return VtArray<GfVec4f>();
-// }
-
-static Vector3 to_godot(const GfVec3f& usd_vector) {
-    return Vector3(usd_vector[0], usd_vector[1], usd_vector[2]);
-}
-
-static Vector2 to_godot(const GfVec2f& usd_vector) {
-    return Vector2(usd_vector[0], usd_vector[1]);
-}
 
 // static int get_indx_of_interpolated_attribute(TfToken &interpolation_token, int usd_face_idx, int usd_point_idx, int usd_vertex_idx)
 // {

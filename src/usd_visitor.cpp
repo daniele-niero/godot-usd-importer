@@ -1,5 +1,6 @@
 #include "usd_visitor.h"
 
+
 PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace godot {

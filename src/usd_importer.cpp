@@ -17,7 +17,6 @@ USDImporter::USDImporter() = default;
 USDImporter::~USDImporter() = default;
 
 String USDImporter::_get_importer_name() const {
-    int pippo = 0;
     return "usd.importer";
 }
 
@@ -46,13 +45,13 @@ PackedStringArray USDImporter::_get_recognized_extensions() const {
 
 TypedArray<Dictionary> USDImporter::_get_import_options(const String &p_path, int32_t p_preset_index) const {
     TypedArray<Dictionary> options;
-    Dictionary option;
-    option["name"] = "dummy_option";
-    option["default_value"] = true;
-    option["property_hint"] = PROPERTY_HINT_NONE;
-    option["hint_string"] = "";
-    option["usage"] = PROPERTY_USAGE_DEFAULT;
-    options.append(option);
+    Dictionary dummy_option;
+    dummy_option["name"] = "dummy_option";
+    dummy_option["default_value"] = true;
+    // dummy_option["property_hint"] = PROPERTY_HINT_NONE;
+    dummy_option["hint_string"] = "no use at all";
+    // dummy_option["usage"] = PROPERTY_USAGE_DEFAULT;
+    options.append(dummy_option);
     return options;
 }
 
@@ -89,9 +88,6 @@ Error USDImporter::_import(
         const String &source_file, const String &save_path, const Dictionary &options,
         const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const
 {
-    if (source_file.begins_with("res://addons"))
-        return OK;
-
     Ref<PackedScene> scene;
     scene.instantiate();
 

@@ -1,4 +1,5 @@
 #include "initialization.h"
+#include "godot_cpp/core/print_string.hpp"
 #include "usd_visitor.h"
 #include "basic_import_delegates.h"
 #include "mesh_import_delegates.h"
@@ -11,7 +12,6 @@
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/core/class_db.hpp>
 
-#include <pxr/base/tf/token.h>
 
 PXR_NAMESPACE_USING_DIRECTIVE
 using namespace godot;
@@ -30,13 +30,17 @@ static void register_import_delegates() {
 }
 
 
+using namespace godot;
+
+
 void initialize_usd_importer(ModuleInitializationLevel p_level) {
 	if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
-		print_line("Initializing USD Importer...");
 		register_import_delegates();
 		GDREGISTER_CLASS(USDImporter);
 		GDREGISTER_CLASS(USDEditorPlugin);
+
 		EditorPlugins::add_by_type<USDEditorPlugin>();
+		print_line_rich("[color=grey]--- USD Importer Initialized ---[/color]");
 	}
 }
 
