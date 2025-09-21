@@ -146,7 +146,7 @@ def build_gdextension(args: argparse.Namespace, extension_dir: Path):
         if system == 'windows':
             extra_cmd_args.append('debug_crt=yes')
     else:
-        extra_cmd_args = ['target=template_release']
+        extra_cmd_args = ['target=template_release', 'compiledb=yes']
 
     scons_cmd = ["scons", f"platform={system}"] + extra_cmd_args
 
@@ -159,28 +159,33 @@ def build_gdextension(args: argparse.Namespace, extension_dir: Path):
         Terminal.Blue(f'⚙️  Buiding UsdImporter ...')
         run(scons_cmd)
         Terminal.Green("\n✅ UsdImporter Built Successfully.\n")
-        if args.target == "debug":
-            patch_compile_commands(Path('compile_commands.json'))
+        patch_compile_commands(Path('compile_commands.json'))
 
 
-def create_symlink(target: Path, link_path: Path):
+def create_symlink(args: argparse.Namespace, extension_dir: Path):
+    if args.no_symlink:
+        return
+    
+    source = extension_dir
+    target = Path(args.symlink_to)
     try:
         # Remove old symlink or directory if it exists
-        if link_path.is_symlink() or link_path.exists():
-            if link_path.is_dir() and not link_path.is_symlink():
-                shutil.rmtree(link_path)
+        if target.is_symlink() or target.exists():
+            if target.is_dir() and not target.is_symlink():
+                shutil.rmtree(target)
             else:
-                link_path.unlink()
+                target.unlink()
 
         # Ensure parent directories exist
-        link_path.parent.mkdir(parents=True, exist_ok=True)
+        target.parent.mkdir(parents=True, exist_ok=True)
 
-        link_path.symlink_to(target.resolve(), target_is_directory=target.is_dir())
-        Terminal.Green(f"Symlink created: {link_path} -> {target}")
+        target.symlink_to(source.resolve(), target_is_directory=True)
+        Terminal.Green(f"Symlink created: {target} -> {source}")
 
     except OSError as e:
         Terminal.Red(f"❗Error creating symlink in demo_project: {e}", file=sys.stderr)
-
+        if platform.system().lower() == 'windows':
+            Terminal.Yellow("Even if Administrator, in Windows, to be able to create symlink, you might need to activate 'Developer Mode'")
 
 
 def main(args: argparse.Namespace):
@@ -188,8 +193,8 @@ def main(args: argparse.Namespace):
 
     build_usd(args, extension_dir)
     build_gdextension(args, extension_dir)
-    if args.no_symlink is False:
-        create_symlink(extension_dir, Path('demo_project', 'addons', 'UsdImporter'))
+    create_symlink(args, extension_dir)
+   
 
     Terminal.Green("\n✅ BUILD FINISHED!.")
 
@@ -211,6 +216,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--no-symlink", action="store_true", default=False,
                         help="Don't symlink the compiled extension into demo-project's addons folder")
+    
+    parser.add_argument("--symlink-to", default="demo_project/addons/UsdImporter", help="where to create a symbolic link to the compiled addon")
 
     args = parser.parse_args()
     main(args)
