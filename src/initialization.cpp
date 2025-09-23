@@ -15,7 +15,8 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 using namespace godot;
-
+namespace godot_usd_importer {
+	
 // #ifdef _DEBUG
 // 	TfDebug::SetDebugSymbols(true);
 //     TfDebug::SetTraceFile("usd_trace.log");
@@ -61,4 +62,6 @@ extern "C" {
 
 		return init_obj.init();
 	}
+}
+
 }

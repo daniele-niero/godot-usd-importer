@@ -4,18 +4,17 @@
 #include <pxr/usd/usd/prim.h>
 
 
-PXR_NAMESPACE_USING_DIRECTIVE
-namespace godot {
+namespace godot_usd_importer {
 
 
-Node3D* import_cube(const UsdPrim &usd_prim);
-Node3D* import_sphere(const UsdPrim& usd_prim);
-Node3D* import_cylinder(const UsdPrim& usd_prim);
-Node3D* import_capsule(const UsdPrim& usd_prim);
-Node3D* import_cone(const UsdPrim& usd_prim);
+godot::Node3D* import_cube(const pxr::UsdPrim &usd_prim);
+godot::Node3D* import_sphere(const pxr::UsdPrim& usd_prim);
+godot::Node3D* import_cylinder(const pxr::UsdPrim& usd_prim);
+godot::Node3D* import_capsule(const pxr::UsdPrim& usd_prim);
+godot::Node3D* import_cone(const pxr::UsdPrim& usd_prim);
 void register_basic_solids();
 
-Node3D* import_mesh(const UsdPrim& usd_prim);
+godot::Node3D* import_mesh(const pxr::UsdPrim& usd_prim);
 
 
 }

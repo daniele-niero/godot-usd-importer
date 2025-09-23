@@ -2,8 +2,8 @@
 
 
 PXR_NAMESPACE_USING_DIRECTIVE
-
-namespace godot {
+using namespace godot;
+namespace godot_usd_importer {
 
 
 UsdVisitorRegistry& UsdVisitorRegistry::get_instance() {

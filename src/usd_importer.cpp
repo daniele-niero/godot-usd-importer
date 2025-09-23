@@ -10,8 +10,8 @@
 #include <pxr/usd/usdGeom/mesh.h>
 
 PXR_NAMESPACE_USING_DIRECTIVE
-
-namespace godot {
+using namespace godot;
+namespace godot_usd_importer {
 
 USDImporter::USDImporter() = default;
 USDImporter::~USDImporter() = default;

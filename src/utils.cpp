@@ -1,6 +1,20 @@
 #include "utils.h"
 
-namespace godot {
+#include "godot_cpp/classes/global_constants.hpp"
+#include  "pxr/base/gf/rotation.h"
+
+
+PXR_NAMESPACE_USING_DIRECTIVE
+using namespace godot;
+namespace godot_usd_importer {
+
+
+// inline UpAxis token_to_axis(const TfToken &token); {
+//     if (token == UsdGeomTokens->z) 
+//         return UpAxis::Z;
+//     else
+//         return UpAxis::Y; // in case UsdGeomTokens->y but also when not defined
+// }
 
 VtArray<GfVec3f> get_primvar_vec3f_array(const UsdGeomPrimvar& primvar) {
     VtArray<GfVec3f> array;
@@ -40,5 +54,24 @@ Vector3 to_godot(const GfVec3f& usd_vector) {
 Vector2 to_godot(const GfVec2f& usd_vector) {
     return Vector2(usd_vector[0], usd_vector[1]);
 }
+
+
+EulerOrder to_godot(const UsdGeomXformCommonAPI::RotationOrder usd_rot_order) {
+    switch (usd_rot_order) {
+        case UsdGeomXformCommonAPI::RotationOrder::RotationOrderXYZ:
+            return EulerOrder::EULER_ORDER_XYZ;
+        case UsdGeomXformCommonAPI::RotationOrderXZY:
+            return EulerOrder::EULER_ORDER_XZY;
+        case UsdGeomXformCommonAPI::RotationOrderYXZ:
+            return EulerOrder::EULER_ORDER_YXZ;
+        case UsdGeomXformCommonAPI::RotationOrderYZX:
+            return EulerOrder::EULER_ORDER_YZX;
+        case UsdGeomXformCommonAPI::RotationOrderZXY:
+            return EulerOrder::EULER_ORDER_ZXY;
+        case UsdGeomXformCommonAPI::RotationOrderZYX:
+            return EulerOrder::EULER_ORDER_ZYX;
+    }
+}
+
 
 }

@@ -23,7 +23,8 @@
 
 
 PXR_NAMESPACE_USING_DIRECTIVE
-namespace godot {
+using namespace godot;
+namespace godot_usd_importer {
 
 
 Node3D* import_cube(const UsdPrim& usd_prim) {
