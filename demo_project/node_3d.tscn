@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3 uid="uid://dqclegrkvqe6v"]
+
+[ext_resource type="PackedScene" uid="uid://c4q8r08boineo" path="res://source_usd/Kitchen_set/Kitchen_set.usd" id="1_a202f"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="Kitchen_set" parent="." instance=ExtResource("1_a202f")]
+transform = Transform3D(1, 0, 0, 0, -0.0006807287, 0.99999976, 0, -0.99999976, -0.0006807287, 0, 0, 0)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.9142941, -0.0008844595, 0.40504998, -0.05852382, 0.98921627, 0.1342622, -0.4008008, -0.1464602, 0.90438277, 153.46875, 165.2115, 296.5846)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.987, 221.8, 82.183)
+light_color = Color(1, 1, 0.9647059, 1)
+light_energy = 0.586
+light_indirect_energy = 0.0
+light_volumetric_fog_energy = 0.0
+shadow_enabled = true
+shadow_bias = 0.0
+shadow_opacity = 0.98
+shadow_blur = 0.067
+omni_range = 543.0708
+omni_attenuation = -0.243
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.24165449, 0.46457645, -0.8519225, 0.12422939, 0.8559062, 0.50198764, 0.9623774, -0.22714141, 0.14911956, -456.57056, 169.41254, 0)
+shadow_enabled = true
+shadow_blur = 1.503

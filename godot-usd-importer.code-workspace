@@ -19,6 +19,7 @@
 			"utility": "cpp",
 			"xhash": "cpp",
 			"type_traits": "cpp"
-		}
+		},
+		"C_Cpp.formatting": "disabled"
 	}
 }

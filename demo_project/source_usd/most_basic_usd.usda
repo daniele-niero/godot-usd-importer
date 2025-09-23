@@ -1,4 +1,10 @@
 #usda 1.0
+(
+    defaultPrim = "PolyCube"
+    doc = "Blender v4.0.2"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
 
 def Xform "Root0"
 {
