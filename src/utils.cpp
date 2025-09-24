@@ -83,6 +83,8 @@ EulerOrder to_godot(const UsdGeomXformCommonAPI::RotationOrder usd_rot_order) {
             return EulerOrder::EULER_ORDER_ZXY;
         case UsdGeomXformCommonAPI::RotationOrderZYX:
             return EulerOrder::EULER_ORDER_ZYX;
+        default:
+            return EulerOrder::EULER_ORDER_XYZ;
     }
 }
 

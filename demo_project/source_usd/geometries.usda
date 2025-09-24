@@ -2,7 +2,7 @@
 (
     defaultPrim = "Cube"
     doc = "Blender v4.0.2"
-    metersPerUnit = 1
+    metersPerUnit = 0.5
     upAxis = "Z"
 )
 

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "pxr/pxr.h"
+#include <godot_cpp/classes/node3d.hpp>
+#include <godot_cpp/variant/dictionary.hpp>
+
 #include <pxr/base/tf/hash.h>
 #include <pxr/base/tf/token.h>
 #include <pxr/usd/usd/prim.h>
 #include <pxr/usd/usd/stage.h>
-
-#include <godot_cpp/classes/node3d.hpp>
 
 #include <functional>
 #include <unordered_map>
@@ -14,7 +14,7 @@
 
 namespace godot_usd_importer {
 
-using PrimImportDelegate = std::function<godot::Node3D*(const pxr::UsdPrim&)>;
+using PrimImportDelegate = std::function<godot::Node3D*(const pxr::UsdPrim&, const godot::Dictionary &options)>;
 using PrimImportDelegateMap = std::unordered_map<pxr::TfToken, PrimImportDelegate, pxr::TfToken::HashFunctor>;
 
 class UsdVisitorRegistry {
@@ -38,8 +38,8 @@ private:
 
 class UsdVisitor {
 public:
-    void visit(const pxr::UsdPrim& prim, godot::Node3D* parent_node, godot::Node3D* scene_root);
-    godot::Node3D* build_godot_scene(const pxr::UsdStageRefPtr stage, const godot::String& scene_name);
+    void visit(const pxr::UsdPrim& prim, godot::Node3D* parent_node, godot::Node3D* scene_root, const godot::Dictionary &options);
+    godot::Node3D* build_godot_scene(const pxr::UsdStageRefPtr stage, const godot::String& scene_name, const godot::Dictionary &options);
 };
 
 

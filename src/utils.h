@@ -1,12 +1,10 @@
 #pragma once
 
 #include "godot_cpp/classes/global_constants.hpp"
-#include "godot_cpp/core/class_db.hpp"
 #include "godot_cpp/variant/vector2.hpp"
 #include "godot_cpp/variant/vector3.hpp"
+
 #include "pxr/base/gf/matrix4d.h"
-#include "pxr/base/tf/token.h"
-#include "pxr/usd/usdGeom/tokens.h"
 #include <pxr/usd/usdGeom/primvarsAPI.h>
 #include <pxr/usd/usdGeom/xformCommonAPI.h>
 

@@ -37,13 +37,12 @@ PrimImportDelegate UsdVisitorRegistry::find_delegate_for_prim(const UsdPrim &pri
 }
 
 
-void UsdVisitor::visit(const UsdPrim& prim, Node3D* parent_node, Node3D* scene_root) {
-
+void UsdVisitor::visit(const UsdPrim& prim, Node3D* parent_node, Node3D* scene_root, const godot::Dictionary &options) {
     Node3D* new_node = nullptr;
     auto delegate = UsdVisitorRegistry::get_instance().find_delegate_for_prim(prim);
 
     if (delegate)
-        new_node = delegate(prim); // Call delegate
+        new_node = delegate(prim, options); // Call delegate
 
     if (new_node) {
         new_node->set_name(String(prim.GetName().GetText()));
@@ -54,11 +53,12 @@ void UsdVisitor::visit(const UsdPrim& prim, Node3D* parent_node, Node3D* scene_r
     }
 
     for (const auto& child : prim.GetChildren()) {
-        visit(child, new_node, scene_root);
+        visit(child, new_node, scene_root, options);
     }
 }
 
-Node3D* UsdVisitor::build_godot_scene(const UsdStageRefPtr stage, const String& scene_name) {
+
+Node3D* UsdVisitor::build_godot_scene(const UsdStageRefPtr stage, const String& scene_name, const godot::Dictionary &options) {
     if (!stage) {
         print_error("Invalid USD stage.");
         return nullptr;
@@ -68,7 +68,7 @@ Node3D* UsdVisitor::build_godot_scene(const UsdStageRefPtr stage, const String& 
     scene_root->set_name(scene_name);
 
     UsdPrim root_prim = stage->GetPseudoRoot();
-    visit(root_prim, scene_root, scene_root);
+    visit(root_prim, scene_root, scene_root, options);
 
     return scene_root;
 }

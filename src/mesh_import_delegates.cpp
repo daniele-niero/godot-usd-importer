@@ -1,5 +1,6 @@
 #include "mesh_import_delegates.h"
 #include "basic_import_delegates.h"
+#include "pxr/base/gf/matrix3d.h"
 #include "usd_visitor.h"
 #include "utils.h"
 
@@ -28,7 +29,7 @@ using namespace godot;
 namespace godot_usd_importer {
 
 
-Node3D* import_cube(const UsdPrim& usd_prim) {
+Node3D* import_cube(const UsdPrim& usd_prim, const godot::Dictionary &options) {
     Ref<BoxMesh> box_mesh;
     box_mesh.instantiate();
 
@@ -45,7 +46,7 @@ Node3D* import_cube(const UsdPrim& usd_prim) {
 }
 
 
-Node3D* import_sphere(const UsdPrim& usd_prim) {
+Node3D* import_sphere(const UsdPrim& usd_prim, const godot::Dictionary &options) {
     Ref<SphereMesh> sphere_mesh;
     sphere_mesh.instantiate();
 
@@ -64,7 +65,7 @@ Node3D* import_sphere(const UsdPrim& usd_prim) {
 }
 
 
-Node3D* import_cylinder(const UsdPrim& usd_prim) {
+Node3D* import_cylinder(const UsdPrim& usd_prim, const godot::Dictionary &options) {
     Ref<CylinderMesh> cylinder_mesh;
     cylinder_mesh.instantiate();
 
@@ -85,7 +86,7 @@ Node3D* import_cylinder(const UsdPrim& usd_prim) {
 }
 
 
-Node3D* import_capsule(const UsdPrim& usd_prim) {
+Node3D* import_capsule(const UsdPrim& usd_prim, const godot::Dictionary &options) {
     Ref<CapsuleMesh> capsule_mesh;
     capsule_mesh.instantiate();
 
@@ -105,7 +106,7 @@ Node3D* import_capsule(const UsdPrim& usd_prim) {
 }
 
 
-Node3D* import_cone(const UsdPrim& usd_prim) {
+Node3D* import_cone(const UsdPrim& usd_prim, const godot::Dictionary &options) {
     Ref<CylinderMesh> cone_mesh;
     cone_mesh.instantiate();
 
@@ -193,10 +194,12 @@ static bool get_usd_mesh_data(
 }
 
 
-Node3D* import_mesh(const UsdPrim &usd_prim) {
+Node3D* import_mesh(const UsdPrim &usd_prim, const godot::Dictionary &options) {
     TfToken up_axis = UsdGeomGetStageUpAxis(usd_prim.GetStage());
+    double meters_per_unit = UsdGeomGetStageMetersPerUnit(usd_prim.GetStage());
     unsigned int z_up = 0;
-    if (up_axis == UsdGeomTokens->z)
+    bool convert_if_zup = options.get("zup_conversion", true);
+    if (up_axis == UsdGeomTokens->z && convert_if_zup == true)
         z_up = 1;
 
     UsdGeomMesh usd_mesh(usd_prim);
@@ -284,11 +287,11 @@ Node3D* import_mesh(const UsdPrim &usd_prim) {
                         usd_normal_idx = current_normals_indices[j];
 
                     if (z_up){
-                        gd_vertices.append(to_godot(ztoy_rot * usd_points[usd_vertex_idx]));
-                        gd_normals.append(to_godot(ztoy_rot * usd_normals[usd_normal_idx]));
+                        gd_vertices.append(to_godot(ztoy_rot * usd_points[usd_vertex_idx]) * meters_per_unit);
+                        gd_normals.append(to_godot(ztoy_rot * usd_normals[usd_normal_idx]) * meters_per_unit);
                     } else {
-                        gd_vertices.append(to_godot(usd_points[usd_vertex_idx]));
-                        gd_normals.append(to_godot(usd_normals[usd_normal_idx]));
+                        gd_vertices.append(to_godot(usd_points[usd_vertex_idx]) * meters_per_unit);
+                        gd_normals.append(to_godot(usd_normals[usd_normal_idx]) * meters_per_unit);
                     }
                     gd_indices.append(gd_vertices.size() - 1);
                 }
@@ -323,16 +326,16 @@ Node3D* import_mesh(const UsdPrim &usd_prim) {
                             usd_normal_idx = usd_vertex_idx;
                         }
                         if (z_up){
-                            gd_normals.append(to_godot(ztoy_rot * usd_normals[usd_normal_idx]));
+                            gd_normals.append(to_godot(ztoy_rot * usd_normals[usd_normal_idx]) * meters_per_unit);
                         } else {
-                            gd_normals.append(to_godot(usd_normals[usd_normal_idx]));
+                            gd_normals.append(to_godot(usd_normals[usd_normal_idx]) * meters_per_unit);
                         }
                     }
 
                     if (z_up){
-                        gd_vertices.append(to_godot(ztoy_rot * usd_points[usd_vertex_idx]));
+                        gd_vertices.append(to_godot(ztoy_rot * usd_points[usd_vertex_idx]) * meters_per_unit);
                     } else {
-                        gd_vertices.append(to_godot(usd_points[usd_vertex_idx]));
+                        gd_vertices.append(to_godot(usd_points[usd_vertex_idx]) * meters_per_unit);
                     }
 
                     gd_indices.append(gd_vertices.size() - 1);
@@ -372,7 +375,7 @@ Node3D* import_mesh(const UsdPrim &usd_prim) {
 
     MeshInstance3D *mesh_instance = memnew(MeshInstance3D);
     mesh_instance->set_mesh(array_mesh);
-    set_node_transform(mesh_instance, usd_prim);
+    set_node_transform(mesh_instance, usd_prim, convert_if_zup);
     return mesh_instance;
 }
 
