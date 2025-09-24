@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://dds66d4teg56y"]
+
+[ext_resource type="PackedScene" uid="uid://fn50x6q80h8" path="res://source_usd/cube.usda" id="1_thr6f"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mou6f"]
+albedo_color = Color(0.79607844, 0.67058825, 1, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_fckek"]
+material = SubResource("StandardMaterial3D_mou6f")
+top_radius = 0.0
+bottom_radius = 1.0
+
+[node name="Node3D" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.8679453, -0.064878695, 0.49240386, 0.17101006, 0.96984625, -0.17364818, -0.46629, 0.23492314, 0.8528685, 0, 0, 0)
+mesh = SubResource("CylinderMesh_fckek")
+
+[node name="cube" parent="." instance=ExtResource("1_thr6f")]
+
+[editable path="cube"]
