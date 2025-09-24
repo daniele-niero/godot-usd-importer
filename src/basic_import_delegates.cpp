@@ -1,4 +1,6 @@
 #include "basic_import_delegates.h"
+#include "pxr/base/gf/vec3d.h"
+#include "pxr/base/gf/transform.h"
 #include "utils.h"
 
 #include <pxr/usd/usdGeom/metrics.h>
@@ -19,31 +21,40 @@ namespace godot_usd_importer {
 
 void set_node_transform(Node3D* gd_node, const UsdPrim &usd_prim) {
     if (!usd_prim) return;
+    TfToken up_axis = UsdGeomGetStageUpAxis(usd_prim.GetStage());
 
     UsdGeomXformable xformable(usd_prim);
     if (!xformable) return;
 
     UsdGeomXformCommonAPI xformable_api(usd_prim);
-    GfVec3d tr;
-    GfVec3f rot, scl, piv;
-    UsdGeomXformCommonAPI::RotationOrder rot_order; 
-    xformable_api.GetXformVectors(&tr, &rot, &scl, &piv, &rot_order, UsdTimeCode::Default());
 
-    // Usd only defines up axis y or z.
-    // Godot is always y up, so the only case we need to handle is when usd is z up
-    TfToken up_axis = UsdGeomGetStageUpAxis(usd_prim.GetStage());
+
+    GfMatrix4d usd_mat;
+    bool resets;
+    xformable.GetLocalTransformation(&usd_mat, &resets, UsdTimeCode::Default());
+    usd_mat = usd_mat.RemoveScaleShear();
     if (up_axis == UsdGeomTokens->z) {
-        rot = GfVec3f(rot[0], -rot[2], rot[1]);
+        usd_mat = ZupToYup(usd_mat);
     }
-
-    Basis gd_basis;
-    gd_basis.set_euler(to_godot(rot), to_godot(rot_order));
+    
+    gd_node->set_rotation_order(get_rotation_order(xformable));
+    Basis gd_basis = Basis(
+        Vector3(usd_mat[0][0], usd_mat[0][1], usd_mat[0][2]),
+        Vector3(usd_mat[1][0], usd_mat[1][1], usd_mat[1][2]),
+        Vector3(usd_mat[2][0], usd_mat[2][1], usd_mat[2][2])
+    );
     // scale
+    GfVec3d scl = GfTransform(usd_mat).GetScale();
     gd_basis[0] = gd_basis[0] * scl[0];
     gd_basis[1] = gd_basis[1] * scl[1];
     gd_basis[2] = gd_basis[2] * scl[2];
+
+    Transform3D gd_transform;
+    gd_transform.basis = gd_basis;
+
+    gd_transform.origin = Vector3(usd_mat[3][0], usd_mat[3][1], usd_mat[3][2]);
+
     
-    Transform3D gd_transform(gd_basis, Vector3(tr[0], tr[1], tr[2]));
     gd_node->set_transform(gd_transform);
 }
 

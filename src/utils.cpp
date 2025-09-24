@@ -1,6 +1,7 @@
 #include "utils.h"
 
 #include "godot_cpp/classes/global_constants.hpp"
+#include "pxr/base/gf/matrix4d.h"
 #include  "pxr/base/gf/rotation.h"
 
 
@@ -9,12 +10,18 @@ using namespace godot;
 namespace godot_usd_importer {
 
 
-// inline UpAxis token_to_axis(const TfToken &token); {
-//     if (token == UsdGeomTokens->z) 
-//         return UpAxis::Z;
-//     else
-//         return UpAxis::Y; // in case UsdGeomTokens->y but also when not defined
-// }
+static const GfMatrix4d conversion_mat(
+    1.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 1.0
+);
+
+GfMatrix4d ZupToYup(GfMatrix4d &in_mat) {
+    // Conjugate: M' = C * M * C⁻¹
+    return conversion_mat * in_mat * conversion_mat.GetInverse();
+}
+
 
 VtArray<GfVec3f> get_primvar_vec3f_array(const UsdGeomPrimvar& primvar) {
     VtArray<GfVec3f> array;
@@ -55,6 +62,14 @@ Vector2 to_godot(const GfVec2f& usd_vector) {
     return Vector2(usd_vector[0], usd_vector[1]);
 }
 
+Vector3 to_godot(const GfVec3d& usd_vector) {
+    return Vector3(usd_vector[0], usd_vector[1], usd_vector[2]);
+}
+
+Vector2 to_godot(const GfVec2d& usd_vector) {
+    return Vector2(usd_vector[0], usd_vector[1]);
+}
+
 
 EulerOrder to_godot(const UsdGeomXformCommonAPI::RotationOrder usd_rot_order) {
     switch (usd_rot_order) {
@@ -71,6 +86,30 @@ EulerOrder to_godot(const UsdGeomXformCommonAPI::RotationOrder usd_rot_order) {
         case UsdGeomXformCommonAPI::RotationOrderZYX:
             return EulerOrder::EULER_ORDER_ZYX;
     }
+}
+
+EulerOrder get_rotation_order(const UsdGeomXformable &xformable) {
+    bool reset;
+    for (const UsdGeomXformOp &op : xformable.GetOrderedXformOps(&reset)) {
+        auto type = op.GetOpType();
+        switch (type) {
+            case UsdGeomXformOp::TypeRotateXYZ:
+                return EulerOrder::EULER_ORDER_XYZ;
+            case UsdGeomXformOp::TypeRotateXZY:
+                return EulerOrder::EULER_ORDER_XZY;
+            case UsdGeomXformOp::TypeRotateYXZ:
+                return EulerOrder::EULER_ORDER_YXZ;
+            case UsdGeomXformOp::TypeRotateYZX:
+                return EulerOrder::EULER_ORDER_YZX;
+            case UsdGeomXformOp::TypeRotateZXY:
+                return EulerOrder::EULER_ORDER_ZXY;
+            case UsdGeomXformOp::TypeRotateZYX:
+                return EulerOrder::EULER_ORDER_ZYX;
+            default:
+                return EulerOrder::EULER_ORDER_XYZ;
+        }
+    }
+    return EulerOrder::EULER_ORDER_XYZ;
 }
 
 
