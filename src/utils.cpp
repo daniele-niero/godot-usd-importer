@@ -2,24 +2,22 @@
 
 #include "godot_cpp/classes/global_constants.hpp"
 #include "pxr/base/gf/matrix4d.h"
-#include  "pxr/base/gf/rotation.h"
 
 
 PXR_NAMESPACE_USING_DIRECTIVE
 using namespace godot;
 namespace godot_usd_importer {
 
+static const GfMatrix3d ztoy_rot_inv = ztoy_rot.GetInverse();
+static const GfMatrix4d ztoy_mat_inv = ztoy_mat.GetInverse();
 
-static const GfMatrix4d conversion_mat(
-    1.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 1.0, 0.0,
-    0.0, 1.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 1.0
-);
 
 GfMatrix4d ZupToYup(GfMatrix4d &in_mat) {
-    // Conjugate: M' = C * M * C⁻¹
-    return conversion_mat * in_mat * conversion_mat.GetInverse();
+    return ztoy_mat * in_mat * ztoy_mat_inv;
+}
+
+GfMatrix3d ZupToYup(GfMatrix3d &in_rot) {
+    return ztoy_rot * in_rot * ztoy_rot_inv;
 }
 
 

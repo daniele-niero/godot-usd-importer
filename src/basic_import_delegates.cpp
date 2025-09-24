@@ -32,12 +32,12 @@ void set_node_transform(Node3D* gd_node, const UsdPrim &usd_prim) {
     GfMatrix4d usd_mat;
     bool resets;
     xformable.GetLocalTransformation(&usd_mat, &resets, UsdTimeCode::Default());
-    usd_mat = usd_mat.RemoveScaleShear();
     if (up_axis == UsdGeomTokens->z) {
         usd_mat = ZupToYup(usd_mat);
     }
-    
+
     gd_node->set_rotation_order(get_rotation_order(xformable));
+    usd_mat = usd_mat.RemoveScaleShear();
     Basis gd_basis = Basis(
         Vector3(usd_mat[0][0], usd_mat[0][1], usd_mat[0][2]),
         Vector3(usd_mat[1][0], usd_mat[1][1], usd_mat[1][2]),
@@ -54,7 +54,6 @@ void set_node_transform(Node3D* gd_node, const UsdPrim &usd_prim) {
 
     gd_transform.origin = Vector3(usd_mat[3][0], usd_mat[3][1], usd_mat[3][2]);
 
-    
     gd_node->set_transform(gd_transform);
 }
 

@@ -13,6 +13,7 @@
 #include <godot_cpp/classes/cylinder_mesh.hpp>
 #include <godot_cpp/classes/capsule_mesh.hpp>
 
+#include "pxr/usd/usdGeom/metrics.h"
 #include <pxr/usd/usdGeom/cube.h>
 #include <pxr/usd/usdGeom/sphere.h>
 #include <pxr/usd/usdGeom/cone.h>
@@ -193,6 +194,11 @@ static bool get_usd_mesh_data(
 
 
 Node3D* import_mesh(const UsdPrim &usd_prim) {
+    TfToken up_axis = UsdGeomGetStageUpAxis(usd_prim.GetStage());
+    unsigned int z_up = 0;
+    if (up_axis == UsdGeomTokens->z)
+        z_up = 1;
+
     UsdGeomMesh usd_mesh(usd_prim);
     // variables that will hold the data from the USD mesh
     VtArray<GfVec3f> usd_points;
@@ -222,7 +228,7 @@ Node3D* import_mesh(const UsdPrim &usd_prim) {
 
     int vertex_offset = 0;
 
-    for (int usd_face_index = 0; usd_face_index < usd_face_vertex_counts.size(); ++usd_face_index) {
+    for (size_t usd_face_index = 0; usd_face_index < usd_face_vertex_counts.size(); ++usd_face_index) {
         int current_face_vertex_count = usd_face_vertex_counts[usd_face_index];
 
         VtArray<int> current_face_vertex_indices;
@@ -277,10 +283,14 @@ Node3D* import_mesh(const UsdPrim &usd_prim) {
                     if (usd_normal_interp == TfToken("faceVarying"))
                         usd_normal_idx = current_normals_indices[j];
 
-                    gd_vertices.append(to_godot(usd_points[usd_vertex_idx]));
+                    if (z_up){
+                        gd_vertices.append(to_godot(ztoy_rot * usd_points[usd_vertex_idx]));
+                        gd_normals.append(to_godot(ztoy_rot * usd_normals[usd_normal_idx]));
+                    } else {
+                        gd_vertices.append(to_godot(usd_points[usd_vertex_idx]));
+                        gd_normals.append(to_godot(usd_normals[usd_normal_idx]));
+                    }
                     gd_indices.append(gd_vertices.size() - 1);
-
-                    gd_normals.append(to_godot(usd_normals[usd_normal_idx]));
                 }
             }
 
@@ -312,10 +322,19 @@ Node3D* import_mesh(const UsdPrim &usd_prim) {
                         } else {
                             usd_normal_idx = usd_vertex_idx;
                         }
-                        gd_normals.append(to_godot(usd_normals[usd_normal_idx]));
+                        if (z_up){
+                            gd_normals.append(to_godot(ztoy_rot * usd_normals[usd_normal_idx]));
+                        } else {
+                            gd_normals.append(to_godot(usd_normals[usd_normal_idx]));
+                        }
                     }
 
-                    gd_vertices.append(to_godot(usd_points[usd_vertex_idx]));
+                    if (z_up){
+                        gd_vertices.append(to_godot(ztoy_rot * usd_points[usd_vertex_idx]));
+                    } else {
+                        gd_vertices.append(to_godot(usd_points[usd_vertex_idx]));
+                    }
+
                     gd_indices.append(gd_vertices.size() - 1);
                 }
             }

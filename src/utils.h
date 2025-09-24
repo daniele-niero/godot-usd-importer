@@ -15,6 +15,20 @@ namespace godot_usd_importer {
 
 const double cDegToRad = M_PI / 180.0;
 
+const pxr::GfMatrix3d ztoy_rot(
+    1.0,  0.0,  0.0,
+    0.0,  0.0,  1.0,
+    0.0, -1.0,  0.0
+);
+
+const pxr::GfMatrix4d ztoy_mat(
+    1.0,  0.0,  0.0,  0.0,
+    0.0,  0.0,  1.0,  0.0,
+    0.0, -1.0,  0.0,  0.0,
+    0.0,  0.0,  0.0,  1.0
+);
+
+pxr::GfMatrix3d ZupToYup(pxr::GfMatrix3d &in_rot);
 pxr::GfMatrix4d ZupToYup(pxr::GfMatrix4d &in_mat);
 
 pxr::VtArray<pxr::GfVec3f> get_primvar_vec3f_array(const pxr::UsdGeomPrimvar& primvar);
