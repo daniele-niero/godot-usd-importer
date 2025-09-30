@@ -11,8 +11,6 @@
 
 namespace godot_usd_importer {
 
-const double cDegToRad = M_PI / 180.0;
-
 const pxr::GfMatrix3d ztoy_rot(
     1.0,  0.0,  0.0,
     0.0,  0.0,  1.0,
@@ -40,4 +38,13 @@ godot::Vector2 to_godot(const pxr::GfVec2d &usd_vector);
 godot::EulerOrder to_godot(const pxr::UsdGeomXformCommonAPI::RotationOrder rotOrder);
 
 godot::EulerOrder get_rotation_order(const pxr::UsdGeomXformable &xformable);
+
+template <class T>
+pxr::VtArray<T> slice_vtarray(const pxr::VtArray<T>& arr, size_t start, size_t end)
+{
+    if (start > arr.size()) start = arr.size();
+    if (end > arr.size()) end = arr.size();
+    if (end < start) end = start;
+    return pxr::VtArray<T>(arr.begin() + start, arr.begin() + end);
+}
 }
