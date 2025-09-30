@@ -12,4 +12,4 @@ config_version=5
 
 config/name="USD Importer"
 config/features=PackedStringArray("4.5", "Forward Plus")
-config/icon="uid://c7gn6wjxymt80"
+config/icon="res://usd_logo.svg"
