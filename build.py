@@ -82,7 +82,7 @@ def build_usd(args: argparse.Namespace, extension_dir: Path):
         usd_cmd = [
             sys.executable, str(build_usd_script),
             "--no-python", "--no-examples", "--no-tutorials", "--no-tools", "--no-materialx", "--no-imaging",
-            "--quiet",
+            # "--quiet",
             "--build-monolithic",
             f"--build-variant", variant,
             str(usd_build_dir)
@@ -97,6 +97,7 @@ def build_usd(args: argparse.Namespace, extension_dir: Path):
         usd_lib_path = usd_build_dir.joinpath("lib")
 
         extension_bin_dir = extension_dir.joinpath('bin')
+        patterns = ('*.dll', '*.pdb') if variant == 'debug' else ('*.dll',)
 
         # copy USD folder (schemas and such)
         Terminal.Default('Copying "usd" folder (schemas and such) ...')
@@ -109,24 +110,26 @@ def build_usd(args: argparse.Namespace, extension_dir: Path):
         Terminal.Inline('Copying "usd" folder (schemas and such) Done!')
 
         # copy all shared libraries from usd_bin_path (most likely only one dll, since we built Usd as "monolithic")
-        for dll_file in usd_lib_path.glob('*.dll'):
-            Terminal.Inline(f'Copying {dll_file} folder (schemas and such) ...')
-            shutil.copyfile(str(dll_file), str(extension_bin_dir.joinpath(dll_file.name)))
-            Terminal.Inline(f'Copying {dll_file} folder (schemas and such) Done!')
-
-        # tbb is a dependency of Usd's dll
-        if variant == 'debug':
-            for dll_file in usd_bin_path.glob('*.dll'):
+        for pattern in patterns:
+            for dll_file in usd_lib_path.glob(pattern):
                 Terminal.Inline(f'Copying {dll_file} folder (schemas and such) ...')
                 shutil.copyfile(str(dll_file), str(extension_bin_dir.joinpath(dll_file.name)))
                 Terminal.Inline(f'Copying {dll_file} folder (schemas and such) Done!')
+
+        # tbb is a dependency of Usd's dll
+        if variant == 'debug':
+            for pattern in patterns:
+                for dll_file in usd_bin_path.glob('*.dll'):
+                    Terminal.Inline(f'Copying {dll_file} folder (schemas and such) ...')
+                    shutil.copyfile(str(dll_file), str(extension_bin_dir.joinpath(dll_file.name)))
+                    Terminal.Inline(f'Copying {dll_file} folder (schemas and such) Done!')
         else:
             tbb_dll = usd_bin_path.joinpath('tbb.dll')
             Terminal.Inline(f'Copying {tbb_dll} folder (schemas and such) ...')
             shutil.copyfile(str(tbb_dll), str(extension_bin_dir.joinpath(tbb_dll.name)))
             Terminal.Inline(f'Copying {tbb_dll} folder (schemas and such) Done!')
 
-        Terminal.Green("\n✅ Installed USD in Extesnion Directory successfully.\n")
+        Terminal.Green("\n✅ Installed USD in Extension Directory successfully.\n")
 
 
 def build_gdextension(args: argparse.Namespace, extension_dir: Path):
