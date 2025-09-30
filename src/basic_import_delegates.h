@@ -4,13 +4,13 @@
 #include <pxr/usd/usd/prim.h>
 
 
-PXR_NAMESPACE_USING_DIRECTIVE
-namespace godot {
+
+namespace godot_usd_importer {
 
 
-void set_node_transform(Node3D* gd_node, const UsdPrim &usd_prim);
+void set_node_transform(godot::Node3D* gd_node, const pxr::UsdPrim &usd_prim, const bool convert_if_zup=true);
 
-Node3D* import_xformable(const UsdPrim &usd_prim);
+godot::Node3D* import_xformable(const pxr::UsdPrim &usd_prim, const godot::Dictionary &options);
 
 
 } // end godot namespace

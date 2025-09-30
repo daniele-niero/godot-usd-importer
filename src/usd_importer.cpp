@@ -1,4 +1,5 @@
 #include "usd_importer.h"
+#include "godot_cpp/classes/global_constants.hpp"
 #include "usd_visitor.h"
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/string.hpp>
@@ -10,14 +11,13 @@
 #include <pxr/usd/usdGeom/mesh.h>
 
 PXR_NAMESPACE_USING_DIRECTIVE
-
-namespace godot {
+using namespace godot;
+namespace godot_usd_importer {
 
 USDImporter::USDImporter() = default;
 USDImporter::~USDImporter() = default;
 
 String USDImporter::_get_importer_name() const {
-    int pippo = 0;
     return "usd.importer";
 }
 
@@ -44,15 +44,14 @@ PackedStringArray USDImporter::_get_recognized_extensions() const {
     return exts;
 }
 
-TypedArray<Dictionary> USDImporter::_get_import_options(const String &p_path, int32_t p_preset_index) const {
+TypedArray<Dictionary> USDImporter::_get_import_options(const String &path, int32_t preset_index) const {
     TypedArray<Dictionary> options;
-    Dictionary option;
-    option["name"] = "dummy_option";
-    option["default_value"] = true;
-    option["property_hint"] = PROPERTY_HINT_NONE;
-    option["hint_string"] = "";
-    option["usage"] = PROPERTY_USAGE_DEFAULT;
-    options.append(option);
+
+    Dictionary zup_option;
+    zup_option["name"] = "zup_conversion";
+    zup_option["default_value"] = true;
+    options.append(zup_option);
+
     return options;
 }
 
@@ -76,7 +75,7 @@ int32_t USDImporter::_get_format_version() const {
     return 1; // Version of the importer
 }
 
-bool USDImporter::_get_option_visibility(const String &p_path, const StringName &option_name, const Dictionary &options) const {
+bool USDImporter::_get_option_visibility(const String &path, const StringName &option_name, const Dictionary &options) const {
     // For now, we can return true for all options
     return true;
 }
@@ -89,9 +88,6 @@ Error USDImporter::_import(
         const String &source_file, const String &save_path, const Dictionary &options,
         const TypedArray<String> &platform_variants, const TypedArray<String> &gen_files) const
 {
-    if (source_file.begins_with("res://addons"))
-        return OK;
-
     Ref<PackedScene> scene;
     scene.instantiate();
 
@@ -117,7 +113,7 @@ Error USDImporter::_import(
     String root_name = godot_path.get_file().get_basename();
 
     UsdVisitor visitor = UsdVisitor();
-    Node3D* root_node = visitor.build_godot_scene(stage, root_name);
+    Node3D* root_node = visitor.build_godot_scene(stage, root_name, options);
 
     scene->pack(root_node);
     String file_path = save_path + String(".") + _get_save_extension();

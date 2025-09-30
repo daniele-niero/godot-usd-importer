@@ -5,12 +5,13 @@
             "name": "(Windows) Attach",
             "type": "cppvsdbg",
             "request": "attach",
+            "symbolSearchPath": "${workspaceFolder}/addons/debug/UsdImporter/bin"
         },
         {
             "name": "(Windows) Launch",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "Godot_v4.4.exe",
+            "program": "Godot_4.5.exe",
             "args": [
                 "--editor",
                 "--path",
@@ -19,7 +20,8 @@
             "stopAtEntry": false,
             // "cwd": "C:/path/to/GodotEditor.exe/folder",
             "environment": [],
-            "console": false,
+            "symbolSearchPath": "${workspaceFolder}/addons/debug/UsdImporter/bin"
+
         }
     ]
 }

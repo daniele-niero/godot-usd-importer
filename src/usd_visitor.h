@@ -1,30 +1,30 @@
 #pragma once
 
+#include <godot_cpp/classes/node3d.hpp>
+#include <godot_cpp/variant/dictionary.hpp>
+
 #include <pxr/base/tf/hash.h>
 #include <pxr/base/tf/token.h>
 #include <pxr/usd/usd/prim.h>
 #include <pxr/usd/usd/stage.h>
 
-#include <godot_cpp/classes/node3d.hpp>
-
 #include <functional>
 #include <unordered_map>
 
 
-PXR_NAMESPACE_USING_DIRECTIVE
-namespace godot {
+namespace godot_usd_importer {
 
-using PrimImportDelegate = std::function<Node3D*(const UsdPrim&)>;
-using PrimImportDelegateMap = std::unordered_map<TfToken, PrimImportDelegate, TfToken::HashFunctor>;
+using PrimImportDelegate = std::function<godot::Node3D*(const pxr::UsdPrim&, const godot::Dictionary &options)>;
+using PrimImportDelegateMap = std::unordered_map<pxr::TfToken, PrimImportDelegate, pxr::TfToken::HashFunctor>;
 
 class UsdVisitorRegistry {
 public:
     // Access the singleton registry
     static UsdVisitorRegistry& get_instance();
 
-    void register_delegate(const TfToken& typeName, PrimImportDelegate delegate);
+    void register_delegate(const pxr::TfToken& typeName, PrimImportDelegate delegate);
     const PrimImportDelegateMap& get_delegates() const;
-    PrimImportDelegate find_delegate_for_prim(const UsdPrim &prim);
+    PrimImportDelegate find_delegate_for_prim(const pxr::UsdPrim &prim);
 
 private:
     PrimImportDelegateMap delegates;
@@ -38,9 +38,9 @@ private:
 
 class UsdVisitor {
 public:
-    void visit(const UsdPrim& prim, Node3D* parent_node, Node3D* scene_root);
-    Node3D* build_godot_scene(const UsdStageRefPtr stage, const String& scene_name);
+    void visit(const pxr::UsdPrim& prim, godot::Node3D* parent_node, godot::Node3D* scene_root, const godot::Dictionary &options);
+    godot::Node3D* build_godot_scene(const pxr::UsdStageRefPtr stage, const godot::String& scene_name, const godot::Dictionary &options);
 };
 
 
-} // namespace godot
+} // namespace godot_usd_importer

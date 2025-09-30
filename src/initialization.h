@@ -2,7 +2,9 @@
 
 #include <godot_cpp/core/class_db.hpp>
 
-using namespace godot;
+namespace godot_usd_importer {
 
-void initialize_usd_importer(ModuleInitializationLevel p_level);
-void uninitialize_usd_importer(ModuleInitializationLevel p_level);
+void initialize_usd_importer(godot::ModuleInitializationLevel p_level);
+void uninitialize_usd_importer(godot::ModuleInitializationLevel p_level);
+
+}
