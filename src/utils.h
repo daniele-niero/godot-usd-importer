@@ -35,8 +35,9 @@ godot::Vector3 to_godot(const pxr::GfVec3f &usd_vector);
 godot::Vector2 to_godot(const pxr::GfVec2f &usd_vector);
 godot::Vector3 to_godot(const pxr::GfVec3d &usd_vector);
 godot::Vector2 to_godot(const pxr::GfVec2d &usd_vector);
+godot::Vector2 to_godot_tex(const pxr::GfVec2d &usd_vector);
+godot::Vector2 to_godot_tex(const pxr::GfVec2f &usd_vector);
 godot::EulerOrder to_godot(const pxr::UsdGeomXformCommonAPI::RotationOrder rotOrder);
-
 godot::EulerOrder get_rotation_order(const pxr::UsdGeomXformable &xformable);
 
 template <class T>

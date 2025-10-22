@@ -68,6 +68,14 @@ Vector2 to_godot(const GfVec2d& usd_vector) {
     return Vector2(usd_vector[0], usd_vector[1]);
 }
 
+Vector2 to_godot_tex(const GfVec2d& usd_vector) {
+    return Vector2(usd_vector[0], 1.0 - usd_vector[1]);
+}
+
+Vector2 to_godot_tex(const GfVec2f& usd_vector) {
+    return Vector2(usd_vector[0], 1.0f - usd_vector[1]);
+}
+
 
 EulerOrder to_godot(const UsdGeomXformCommonAPI::RotationOrder usd_rot_order) {
     switch (usd_rot_order) {

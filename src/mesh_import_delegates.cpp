@@ -169,8 +169,10 @@ Node3D* import_mesh(const UsdPrim &usd_prim, const godot::Dictionary &options) {
     arrays[Mesh::ARRAY_INDEX]  = gd_arrays.indices;
     if (!gd_arrays.normals.is_empty())
         arrays[Mesh::ARRAY_NORMAL] = gd_arrays.normals;
-    if (!gd_arrays.uvs.is_empty())
-        arrays[Mesh::ARRAY_TEX_UV] = gd_arrays.uvs;
+    if (!gd_arrays.uv1.is_empty())
+        arrays[Mesh::ARRAY_TEX_UV] = gd_arrays.uv1;
+    if (!gd_arrays.uv2.is_empty())
+        arrays[Mesh::ARRAY_TEX_UV2] = gd_arrays.uv2;
     if (!gd_arrays.colors.is_empty())
         arrays[Mesh::ARRAY_COLOR]  = gd_arrays.colors;
 

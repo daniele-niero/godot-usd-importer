@@ -1,4 +1,8 @@
 #include "mesh_utils.h"
+#include "pxr/base/tf/nullPtr.h"
+#include "pxr/base/vt/types.h"
+#include "pxr/usd/usd/attribute.h"
+#include "pxr/usd/usdGeom/primvar.h"
 #include "utils.h"
 
 #include <pxr/usd/usdGeom/primvarsAPI.h>
@@ -25,22 +29,22 @@ MeshData::MeshData(const UsdGeomMesh& usd_mesh) {
 
     // ---- UVs ------------------------------------------------------------------------------
     const UsdGeomPrimvarsAPI primvars(usd_mesh);
-    
+
     int main_found = 0;
     std::vector<UsdGeomPrimvar> primvar_list = primvars.GetPrimvars();
     for (const auto& pv : primvar_list) {
         if (pv.GetTypeName() != SdfValueTypeNames->TexCoord2fArray)
             continue;
 
-        // if primvars with these names exists, they have precedence, they are considered the "main"
-        // "st" is actually pixar convention for Uvs
-        // "UVMap" is how blenders calls the uv primvar
-        // and finally "uv" is more generic, commonly used name across DCCs.
+        // if primvars with these names exists, they have precedence, they are considered the "main".
+        // "st" is actually pixar convention for Uvs.
+        // "UVMap" is how Blender calls the uv primvar.
+        // Finally "uv" is a more generic, commonly used name across DCCs.
         const TfToken name = pv.GetBaseName();
-        const bool is_main = (name == TfToken("st") || 
-                              name == TfToken("uv") || 
+        const bool is_main = (name == TfToken("st") ||
+                              name == TfToken("uv") ||
                               name == TfToken("UVMap"));
-        
+
         if (is_main) {
             // ensure main uvs have precedence over other texCoord2f primvars
             main_found++;
@@ -55,11 +59,11 @@ MeshData::MeshData(const UsdGeomMesh& usd_mesh) {
             }
             if (main_found == 2)
                 break;
-        } 
+        }
         else {
             if (usd_uv_primvars.size() < 2) {
                 usd_uv_primvars.push_back(pv);
-            }    
+            }
         }
     }
 
@@ -74,14 +78,14 @@ MeshData::GodotVertexStrategy MeshData::get_vertex_strategy() const {
         return MeshData::GodotVertexStrategy::Unknown;
     }
 
-    bool merged_vertices = (usd_normals.empty() || 
-                            usd_normal_interp == UsdGeomTokens->vertex || 
-                            usd_normal_interp == UsdGeomTokens->varying || 
+    bool merged_vertices = (usd_normals.empty() ||
+                            usd_normal_interp == UsdGeomTokens->vertex ||
+                            usd_normal_interp == UsdGeomTokens->varying ||
                             usd_normal_interp == UsdGeomTokens->constant);
     if (merged_vertices) {
         for (const UsdGeomPrimvar &uv : usd_uv_primvars) {
-            if (uv.GetInterpolation() != UsdGeomTokens->vertex || 
-                uv.GetInterpolation() != UsdGeomTokens->varying || 
+            if (uv.GetInterpolation() != UsdGeomTokens->vertex ||
+                uv.GetInterpolation() != UsdGeomTokens->varying ||
                 uv.GetInterpolation() != UsdGeomTokens->constant)
                 merged_vertices = false;
         }
@@ -104,20 +108,45 @@ static std::vector<int> make_range(int start, int end) {
     return v;
 }
 
+static std::vector<int> slice(const VtIntArray &array, int start, int end) {
+    // Clamp start/end to safe range
+    int s = std::max(0, start);
+    int e = std::min<int>(end, array.size());
+    if (s >= e) {
+        return {}; // empty slice
+    }
+
+    return std::vector<int>(array.begin() + s, array.begin() + e);
+}
+
 
 std::vector<int> MeshData::get_face_primvar_indices(
-        const std::vector<int> &current_face_vertex_indices, 
-        const int current_face_vertex_count, 
+        const std::vector<int> &current_face_vertex_indices,
         const int vertex_offset,
         const int usd_face_idx,
-        const TfToken &interpolation) const 
+        const UsdGeomPrimvar *pv) const
 {
     std::vector<int> indices;
+    int current_face_vertex_count = current_face_vertex_indices.size();
+
+    TfToken interpolation;
+    VtIntArray usd_indices;
+    if (pv) {
+        interpolation = pv->GetInterpolation();
+        if (pv->IsIndexed())
+            pv->GetIndices(&usd_indices);
+    }
+    else { // assume normals
+        interpolation = this->usd_normal_interp;
+    }
 
     if (interpolation == UsdGeomTokens->faceVarying) {
-        indices = make_range(vertex_offset, vertex_offset + current_face_vertex_count);
+        if (usd_indices.empty())
+            indices = make_range(vertex_offset, vertex_offset + current_face_vertex_count);
+        else
+            indices = slice(usd_indices, vertex_offset, vertex_offset + current_face_vertex_count);
 
-        if (reverse_winding()) {
+        if (reverse_winding()) { // reverse only if normals
             std::reverse(indices.begin(), indices.end());
         }
     }
@@ -140,6 +169,16 @@ bool MeshData::to_godot_arrays(GdMeshArrays &gd_arrays, const double &meters_per
 
     int vertex_offset = 0;
 
+    VtVec2fArray usd_uv1;
+    if (usd_uv_primvars.size() >= 1) {
+        usd_uv_primvars[0].Get(&usd_uv1);
+    }
+
+    VtVec2fArray usd_uv2;
+    if (usd_uv_primvars.size() == 2) {
+        usd_uv_primvars[1].Get(&usd_uv2);
+    }
+
     // iterate through all the USD faces
     for (size_t usd_face_idx = 0; usd_face_idx < usd_face_vertex_counts.size(); ++usd_face_idx) {
         int current_face_vertex_count = usd_face_vertex_counts[usd_face_idx];
@@ -157,28 +196,27 @@ bool MeshData::to_godot_arrays(GdMeshArrays &gd_arrays, const double &meters_per
         int number_of_triangles = current_face_vertex_count - 2;
         int usd_vertex_idx;
         int usd_normal_idx;
+        int usd_uv1_idx;
+        int usd_uv2_idx;
 
-        std::vector<int> current_normals_indices = get_face_primvar_indices(
-            current_face_vertex_indices, current_face_vertex_count, vertex_offset, usd_face_idx, usd_normal_interp);
-        
-        std::vector<int> uv1;
-        std::vector<int> uv2;
+        std::vector<int> current_normals_indices = get_face_primvar_indices(current_face_vertex_indices, vertex_offset, usd_face_idx);
+
+        std::vector<int> current_uv1_indices;
         if (usd_uv_primvars.size() >= 1) {
-            const UsdGeomPrimvar &uv = usd_uv_primvars[0];
-            uv.IsIndexed();
-            uv.GetIndices(VtIntArray *indices)
-            uv1 = get_face_primvar_indices(
-                current_face_vertex_indices, current_face_vertex_count, vertex_offset, usd_face_idx,
-                usd_uv_primvars[0].GetInterpolation()
-            );
+            current_uv1_indices = get_face_primvar_indices(current_face_vertex_indices, vertex_offset, usd_face_idx, &usd_uv_primvars[0]);
         }
-      
+
+        std::vector<int> current_uv2_indices;
+        if (usd_uv_primvars.size() == 2) {
+            current_uv2_indices = get_face_primvar_indices(current_face_vertex_indices, vertex_offset, usd_face_idx, &usd_uv_primvars[1]);
+        }
+
 
         // Godot can only have flat or smooth normals.
         // When smooth (for the whole mesh), we can have shared vertex between faces, and normals will be one per vertex.
         // We also need an indices array to define the point used by a face.
         // When flat normals, we need to duplicate vertices so each face has its own vertices and normals.
-        
+
         int corner;
         for (int triangle_idx = 0; triangle_idx < number_of_triangles; ++triangle_idx) {
             if (get_vertex_strategy() == GodotVertexStrategy::Split) {
@@ -192,13 +230,15 @@ bool MeshData::to_godot_arrays(GdMeshArrays &gd_arrays, const double &meters_per
                         corner = triangle_idx + i;
                     }
 
+                    // TODO: this part is repeated below in the "else if (get_vertex_strategy() == GodotVertexStrategy::Merge)" section
+                    // find a way to amke one single section or call
                     usd_vertex_idx = current_face_vertex_indices[corner];
                     if (zup_to_yup){
                         gd_arrays.vertices.append(to_godot(ztoy_rot * usd_points[usd_vertex_idx]) * meters_per_unit);
                     } else {
                         gd_arrays.vertices.append(to_godot(usd_points[usd_vertex_idx]) * meters_per_unit);
                     }
-                    
+
                     if (!usd_normals.empty()) {
                         usd_normal_idx = current_normals_indices[corner];
                         if (zup_to_yup){
@@ -208,10 +248,20 @@ bool MeshData::to_godot_arrays(GdMeshArrays &gd_arrays, const double &meters_per
                         }
                     }
 
+                    if (!current_uv1_indices.empty()) {
+                        usd_uv1_idx = current_uv1_indices[corner];
+                        gd_arrays.uv1.append(to_godot_tex(usd_uv1[usd_uv1_idx]));
+                    }
+
+                    if (!current_uv2_indices.empty()) {
+                        usd_uv2_idx = current_uv2_indices[corner];
+                        gd_arrays.uv2.append(to_godot_tex(usd_uv2[usd_uv2_idx]));
+                    }
+
                     gd_arrays.indices.append(gd_arrays.vertices.size() - 1);
                 }
             }
-        
+
             else if (get_vertex_strategy() == GodotVertexStrategy::Merge) {
                 // shared vertices between adjacent faces
                 // * vertex: each vertex has its own normal
@@ -229,6 +279,8 @@ bool MeshData::to_godot_arrays(GdMeshArrays &gd_arrays, const double &meters_per
 
                     corner = triangle_idx + i;
 
+                    // TODO: this part is repeated above in the "if (get_vertex_strategy() == GodotVertexStrategy::Split)" section
+                    // find a way to amke one single section or call
                     usd_vertex_idx = current_face_vertex_indices[corner];
                     if (zup_to_yup){
                         gd_arrays.vertices.append(to_godot(ztoy_rot * usd_points[usd_vertex_idx]) * meters_per_unit);
@@ -244,9 +296,20 @@ bool MeshData::to_godot_arrays(GdMeshArrays &gd_arrays, const double &meters_per
                             gd_arrays.normals.append(to_godot(usd_normals[usd_normal_idx]) * meters_per_unit);
                         }
                     }
+
+                    if (!current_uv1_indices.empty()) {
+                        usd_uv1_idx = current_uv1_indices[corner];
+                        gd_arrays.uv1.append(to_godot_tex(usd_uv1[usd_uv1_idx]));
+                    }
+
+                    if (!current_uv2_indices.empty()) {
+                        usd_uv2_idx = current_uv2_indices[corner];
+                        gd_arrays.uv2.append(to_godot_tex(usd_uv2[usd_uv2_idx]));
+                    }
+
                     gd_arrays.indices.append(gd_arrays.vertices.size() - 1);
                 }
-            }   
+            }
         }
 
         vertex_offset += current_face_vertex_count;
