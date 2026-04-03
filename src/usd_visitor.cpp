@@ -1,4 +1,5 @@
 #include "usd_visitor.h"
+#include "pxr/usd/usd/attribute.h"
 
 
 PXR_NAMESPACE_USING_DIRECTIVE
@@ -38,6 +39,13 @@ PrimImportDelegate UsdVisitorRegistry::find_delegate_for_prim(const UsdPrim &pri
 
 
 void UsdVisitor::visit(const UsdPrim& prim, Node3D* parent_node, Node3D* scene_root, const godot::Dictionary &options) {
+
+    UsdAttribute exclude_attr = prim.GetAttribute(EXCLUDE_FROM_IMPORT_ATTR);
+    bool exclude_value = false;
+    if (exclude_attr.IsValid() && exclude_attr.Get(&exclude_value) && exclude_value) {
+        return;
+    }
+
     Node3D* new_node = nullptr;
     auto delegate = UsdVisitorRegistry::get_instance().find_delegate_for_prim(prim);
 

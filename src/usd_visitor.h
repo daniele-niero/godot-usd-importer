@@ -14,6 +14,8 @@
 
 namespace godot_usd_importer {
 
+const pxr::TfToken EXCLUDE_FROM_IMPORT_ATTR = pxr::TfToken("godot_usd_importer:exclude");
+
 using PrimImportDelegate = std::function<godot::Node3D*(const pxr::UsdPrim&, const godot::Dictionary &options)>;
 using PrimImportDelegateMap = std::unordered_map<pxr::TfToken, PrimImportDelegate, pxr::TfToken::HashFunctor>;
 
